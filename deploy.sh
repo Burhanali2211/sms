@@ -1,37 +1,49 @@
 #!/bin/bash
 
 # EduSync Deployment Script
-# This script helps with the deployment process
+# This script automates the deployment process to GitHub and Render
 
-echo "EduSync Deployment Helper"
-echo "========================"
+echo "🚀 Starting EduSync Deployment Process..."
 
-echo "Step 1: Building the frontend"
+# 1. Clean previous builds
+echo "🧹 Cleaning previous builds..."
+rm -rf dist
+rm -rf node_modules/.vite
+
+# 2. Install dependencies
+echo "📦 Installing dependencies..."
+npm install
+
+# 3. Run build verification
+echo "🔍 Verifying build configuration..."
+npm run verify
+
+# 4. Build the application
+echo "🏗️ Building the application..."
 npm run build
 
-if [ $? -ne 0 ]; then
-    echo "Error: Frontend build failed"
-    exit 1
+# 5. Check if build was successful
+if [ ! -d "dist" ]; then
+  echo "❌ Build failed: dist folder not created"
+  exit 1
 fi
 
-echo "Step 2: Frontend built successfully to dist/ folder"
+echo "✅ Build completed successfully"
 
-echo "Step 3: To deploy the frontend, you can now:"
-echo "  - Use Netlify: netlify deploy --prod"
-echo "  - Use Vercel: vercel --prod"
-echo "  - Or deploy the dist/ folder to any static hosting service"
+# 6. Commit and push to GitHub
+echo "💾 Committing changes to GitHub..."
+git add .
+git commit -m "Automated deployment: $(date)"
+git push origin main
 
-echo ""
-echo "Step 4: For the backend deployment:"
-echo "  - Deploy the backend/ folder to Render, Railway, or similar service"
-echo "  - Make sure to set the required environment variables"
-echo "  - DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD, JWT_SECRET"
+echo "✅ Changes pushed to GitHub"
 
-echo ""
-echo "Step 5: Database setup:"
-echo "  - Create a PostgreSQL database on your chosen platform"
-echo "  - Run sql/complete_schema.sql to create tables"
-echo "  - Optionally run sql/02_insert_sample_data.sql for sample data"
+# 7. Instructions for Render deployment
+echo "📋 Deployment Summary:"
+echo "   1. Your code has been pushed to GitHub"
+echo "   2. Go to your Render dashboard to trigger deployment"
+echo "   3. Monitor the deployment logs for any issues"
+echo "   4. Visit https://sms-kn5a.onrender.com after deployment completes"
 
-echo ""
-echo "Deployment complete! Remember to update the VITE_API_URL in your frontend to point to your deployed backend."
+echo "🎉 Deployment process completed!"
+echo "💡 Remember to verify that your environment variables are correctly set on Render"
