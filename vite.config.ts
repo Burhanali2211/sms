@@ -4,7 +4,7 @@ import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: './', // Add this line for proper asset loading on Render
+  base: './', // Essential for proper asset loading on static hosting
   server: {
     host: "::",
     port: 8080,
@@ -30,6 +30,10 @@ export default defineConfig({
   },
   // Handle Node.js modules for browser compatibility
   build: {
+    outDir: 'dist', // Explicitly set output directory
+    assetsDir: 'assets', // Organize assets in a dedicated folder
+    emptyOutDir: true, // Clear output directory before build
+    sourcemap: false, // Disable sourcemaps for production
     commonjsOptions: {
       transformMixedEsModules: true,
       // Explicitly ignore pg-related requires
@@ -43,7 +47,18 @@ export default defineConfig({
           if (id.includes('node_modules')) {
             return 'vendor';
           }
-        }
+        },
+        // Ensure proper asset naming
+        assetFileNames: (assetInfo) => {
+          if (!assetInfo.name) return 'assets/[name][extname]';
+          let extType = assetInfo.name.split('.').pop() || 'misc';
+          if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
+            extType = 'img';
+          }
+          return `assets/${extType}/[name]-[hash][extname]`;
+        },
+        entryFileNames: 'assets/js/[name]-[hash].js',
+        chunkFileNames: 'assets/js/[name]-[hash].js',
       },
     },
   },

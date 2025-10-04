@@ -34,3 +34,10 @@ services:
         value: https://edusync-backend-yg5g.onrender.com/api
     domains:
       - sms-kn5a.onrender.com
+    headers:
+      - path: /*
+        headers:
+          - name: X-Frame-Options
+            value: DENY
+          - name: X-Content-Type-Options
+            value: nosniff
