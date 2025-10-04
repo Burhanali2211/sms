@@ -1,0 +1,363 @@
+# EduSync School Management System - Cursor Rules
+# Enterprise-grade rules for a system serving lakhs of schools
+
+## 🎯 PROJECT OVERVIEW
+This is a multi-tenant school management system (EduSync) that will be deployed to lakhs of schools. 
+- Frontend: React + TypeScript + Vite + Tailwind CSS + Shadcn/ui
+- Backend: Node.js + Express + PostgreSQL
+- Architecture: Multi-tenant with role-based access control
+- Scale: Enterprise-grade for lakhs of schools
+
+## 🚨 CRITICAL REQUIREMENTS
+- ZERO production errors - this affects lakhs of students
+- Multi-tenant isolation must be perfect
+- Security is paramount - handle sensitive student data
+- Performance must scale to thousands of concurrent users
+- Accessibility compliance for all users
+- Mobile-first responsive design
+
+## 📁 PROJECT STRUCTURE
+```
+eit_sms/
+├── src/                    # React frontend (TypeScript)
+│   ├── components/         # Reusable UI components
+│   ├── pages/             # Route pages
+│   ├── hooks/             # Custom React hooks
+│   ├── services/          # API services
+│   ├── types/             # TypeScript type definitions
+│   └── utils/             # Utility functions
+├── backend/               # Node.js API server
+│   ├── routes/            # API endpoints
+│   ├── middleware/        # Express middleware
+│   ├── config/            # Database and app config
+│   └── services/          # Business logic
+├── tenant-service/        # Multi-tenant management
+└── sql/                   # Database migrations
+```
+
+## 🔧 DEVELOPMENT RULES
+
+### TypeScript & React
+- ALWAYS use strict TypeScript - no `any` types
+- Use proper type definitions from `src/types/`
+- Implement proper error boundaries in React components
+- Use React.memo() for performance-critical components
+- Always handle loading and error states
+- Use proper React hooks patterns (useEffect cleanup, etc.)
+
+### Security Requirements
+- ALWAYS validate and sanitize all user inputs
+- Use parameterized queries to prevent SQL injection
+- Implement proper JWT token validation
+- Use bcrypt for password hashing
+- Implement rate limiting on all endpoints
+- Use HTTPS in production
+- Validate file uploads (type, size, content)
+
+### Database Rules
+- Use transactions for multi-table operations
+- Implement proper foreign key constraints
+- Use indexes for frequently queried columns
+- Implement soft deletes where appropriate
+- Use proper data types (UUID for IDs, timestamps)
+- Always handle database connection errors
+
+### API Design
+- Use RESTful conventions
+- Implement proper HTTP status codes
+- Use consistent error response format
+- Implement pagination for large datasets
+- Use proper request/response validation
+- Implement API versioning
+
+### Performance
+- Use database connection pooling
+- Optimize database queries
+- Implement lazy loading for large datasets
+- Use CDN for static assets
+- Implement proper image optimization
+
+### Accessibility
+- Use semantic HTML elements
+- Implement proper ARIA labels
+- Ensure keyboard navigation works
+- Maintain proper color contrast ratios
+- Provide alt text for images
+- Test with screen readers
+
+### Error Handling
+- Implement comprehensive error logging
+- Use proper error boundaries in React
+- Provide user-friendly error messages
+- Log errors with context (user, tenant, action)
+- Implement retry mechanisms for transient failures
+
+## 🎨 UI/UX RULES
+
+### Component Design
+- Use Shadcn/ui components consistently
+- Implement responsive design (mobile-first)
+- Use proper spacing and typography
+- Maintain consistent color scheme
+- Implement proper loading states
+- Use proper form validation
+
+### User Experience
+- Provide clear navigation
+- Implement proper feedback for user actions
+- Use progressive disclosure for complex features
+- Implement proper search and filtering
+- Provide bulk operations where appropriate
+- Use proper confirmation dialogs
+
+## 📊 DATA MANAGEMENT
+
+### Student Data
+- Implement proper data validation
+- Use proper data types for academic information
+- Implement audit trails for grade changes
+- Handle attendance data properly
+- Implement proper grade calculation logic
+
+### Financial Data
+- Use decimal types for monetary values
+- Implement proper transaction logging
+- Use proper accounting principles
+- Implement fee structure management
+- Handle payment processing securely
+
+### Academic Data
+- Implement proper grade scales
+- Handle multiple academic years
+- Implement proper subject management
+- Handle class schedules properly
+- Implement proper exam management
+
+## 🔄 DEPLOYMENT & OPERATIONS
+
+### Environment Management
+- Use proper environment variables
+- Implement proper configuration management
+- Use different configs for dev/staging/prod
+- Implement proper secrets management
+- Use proper logging levels
+
+### Monitoring & Observability
+- Implement proper application monitoring
+- Use structured logging
+- Implement health checks
+- Monitor database performance
+- Track user activity metrics
+
+### Backup & Recovery
+- Implement automated database backups
+- Test recovery procedures
+- Implement data retention policies
+- Handle disaster recovery scenarios
+
+## 🧪 TESTING REQUIREMENTS
+
+### Code Quality
+- Write unit tests for all business logic
+- Implement integration tests for APIs
+- Test multi-tenant isolation thoroughly
+- Test security vulnerabilities
+- Implement proper test coverage
+
+### Performance Testing
+- Test with realistic data volumes
+- Test concurrent user scenarios
+- Monitor memory usage
+- Test database performance
+- Implement load testing
+
+## 📋 SPECIFIC COMPONENT RULES
+
+### Authentication & Authorization
+- Implement proper role-based access control
+- Use JWT tokens with proper expiration
+- Implement proper session management
+- Handle password reset securely
+- Implement proper logout procedures
+
+### File Uploads
+- Validate file types and sizes
+- Implement proper virus scanning
+- Use secure file storage
+- Implement proper file access controls
+- Handle file cleanup properly
+
+### Notifications
+- Implement real-time notifications
+- Use proper notification channels
+- Handle notification preferences
+- Implement notification history
+- Use proper notification templates
+
+### Reporting
+- Implement proper data aggregation
+- Use efficient query patterns
+- Handle large dataset exports
+- Implement proper report scheduling
+
+## 🚫 FORBIDDEN PATTERNS
+
+### Security Anti-Patterns
+- Never store passwords in plain text
+- Never expose sensitive data in logs
+- Never trust client-side validation
+- Never use eval() or similar functions
+- Never expose internal system details
+
+### Performance Anti-Patterns
+- Never use N+1 queries
+- Never load all data at once
+- Never block the main thread
+- Never ignore memory leaks
+- Never skip error handling
+
+### Code Quality Anti-Patterns
+- Never use `any` type in TypeScript
+- Never ignore TypeScript errors
+- Never commit console.log statements
+- Never use hardcoded values
+- Never skip input validation
+
+## ✅ MANDATORY CHECKS
+
+### Before Every Commit
+- Run TypeScript compilation check
+- Run ESLint with no warnings
+- Run all tests
+- Check for security vulnerabilities
+- Verify multi-tenant isolation
+- Test responsive design
+- Verify accessibility compliance
+
+### Before Deployment
+- Run full test suite
+- Perform security audit
+- Test database migrations
+- Verify environment configuration
+- Test backup and recovery
+- Perform load testing
+- Verify monitoring setup
+
+## 🔧 TOOLS & CONFIGURATION
+
+### Required Tools
+- Node.js 18+ for backend
+- TypeScript 5+ for type safety
+- ESLint for code quality
+- Prettier for code formatting
+- Jest for testing
+- PostgreSQL for database
+
+### Code Style
+- Use 2 spaces for indentation
+- Use semicolons consistently
+- Use single quotes for strings
+- Use camelCase for variables
+- Use PascalCase for components
+- Use kebab-case for files
+
+## 📚 DOCUMENTATION REQUIREMENTS
+
+### Code Documentation
+- Document all public APIs
+- Document complex business logic
+- Document database schema changes
+- Document security considerations
+- Document performance optimizations
+
+### User Documentation
+- Provide user guides for all features
+- Document role-based permissions
+- Provide troubleshooting guides
+- Document system requirements
+- Provide training materials
+
+## 🎯 SUCCESS METRICS
+
+### Performance Targets
+- Page load time < 2 seconds
+- API response time < 500ms
+- Database query time < 100ms
+- Support 1000+ concurrent users
+- 99.9% uptime
+
+### Quality Targets
+- 90%+ test coverage
+- Zero critical security vulnerabilities
+- Zero data loss incidents
+- 100% accessibility compliance
+- Zero production errors
+
+## 🚨 EMERGENCY PROCEDURES
+
+### Critical Issues
+- Immediately rollback if data corruption detected
+- Disable affected features if security breach
+- Implement emergency patches for critical bugs
+- Communicate with stakeholders immediately
+- Document incident response procedures
+
+### Data Recovery
+- Implement point-in-time recovery
+- Test recovery procedures regularly
+- Maintain multiple backup locations
+- Document recovery time objectives
+- Train staff on recovery procedures
+
+## 📞 SUPPORT & MAINTENANCE
+
+### Support Procedures
+- Implement proper support ticketing
+- Provide 24/7 monitoring
+- Implement escalation procedures
+- Maintain support documentation
+- Provide training for support staff
+
+### Maintenance Windows
+- Schedule maintenance during off-peak hours
+- Provide advance notice to users
+- Implement zero-downtime deployments
+- Test maintenance procedures
+- Document rollback procedures
+
+## 🎓 EDUCATIONAL COMPLIANCE
+
+### Academic Standards
+- Follow educational data standards
+- Implement proper grade calculation
+- Handle academic calendar properly
+- Support multiple curriculum types
+- Implement proper assessment tracking
+
+### Regulatory Compliance
+- Follow data protection regulations
+- Implement proper audit trails
+- Handle student privacy properly
+- Support educational reporting requirements
+- Implement proper data retention
+
+## 🔄 CONTINUOUS IMPROVEMENT
+
+### Regular Reviews
+- Conduct security audits monthly
+- Review performance metrics weekly
+- Update dependencies regularly
+- Review user feedback monthly
+- Conduct code quality reviews
+
+### Future Planning
+- Plan for feature enhancements
+- Monitor technology trends
+- Plan for scalability improvements
+- Consider integration opportunities
+- Plan for regulatory changes
+
+## 🎯 FINAL REMINDER
+This system will be used by lakhs of schools and affect millions of students. 
+Every line of code must be written with the highest standards of quality, 
+security, and reliability. There is no room for errors in production.

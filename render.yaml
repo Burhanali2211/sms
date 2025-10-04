@@ -1,0 +1,34 @@
+services:
+  - type: web
+    name: edusync-backend
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    rootDir: backend
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        value: your-jwt-secret-here
+      - key: DB_HOST
+        value: dpg-d3g7j363jp1c73eha0m0-a.oregon-postgres.render.com
+      - key: DB_PORT
+        value: 5432
+      - key: DB_NAME
+        value: edusync_db_uhqd
+      - key: DB_USER
+        value: edusync_db_uhqd_user
+      - key: DB_PASSWORD
+        value: hd7FYH2v6aHsPVesKBcOHLts2nTOCPeu
+      - key: CLIENT_URL
+        value: https://your-frontend-url.com
+
+  - type: web
+    name: edusync-frontend
+    env: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://edusync-backend.onrender.com/api
