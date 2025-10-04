@@ -22,13 +22,15 @@ services:
       - key: DB_PASSWORD
         value: hd7FYH2v6aHsPVesKBcOHLts2nTOCPeu
       - key: CLIENT_URL
-        value: https://your-frontend-url.com
+        value: https://sms-kn5a.onrender.com
 
   - type: web
     name: edusync-frontend
     env: static
     buildCommand: npm install && npm run build
-    staticPublishPath: ./dist
+    staticPublishPath: dist
     envVars:
       - key: VITE_API_URL
-        value: https://edusync-backend.onrender.com/api
+        value: https://edusync-backend-yg5g.onrender.com/api
+    domains:
+      - sms-kn5a.onrender.com
