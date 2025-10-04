@@ -102,6 +102,31 @@ Follow steps 1-3 from Option 1 above.
      VITE_APP_ENV=production
      ```
 
+## Automated Deployment Scripts
+
+This repository includes automated deployment scripts for your convenience:
+
+### For Windows Users:
+Run `deploy.bat` from the command line:
+```cmd
+deploy.bat
+```
+
+### For Mac/Linux Users:
+Run `deploy.sh` from the terminal:
+```bash
+chmod +x deploy.sh
+./deploy.sh
+```
+
+These scripts will:
+1. Clean previous builds
+2. Install dependencies
+3. Verify build configuration
+4. Build the application
+5. Commit and push changes to GitHub
+6. Provide instructions for Render deployment
+
 ## Environment Variables Summary
 
 ### Backend (.env for local development)
