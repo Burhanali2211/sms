@@ -1,0 +1,21 @@
+{
+  "name": "edusync-netlify-functions",
+  "version": "1.0.0",
+  "description": "Netlify functions for EduSync with Netlify DB integration",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@netlify/neon": "^0.1.0",
+    "bcrypt": "^5.1.1"
+  },
+  "keywords": [
+    "netlify",
+    "functions",
+    "edusync",
+    "database"
+  ],
+  "author": "EduSync Team",
+  "license": "MIT"
+}

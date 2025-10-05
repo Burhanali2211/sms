@@ -17,7 +17,20 @@ The EduSync application consists of:
 
 ## Deployment Options
 
-### Option 1: Deploy to Netlify (Recommended for Frontend)
+### Option 1: Deploy to Netlify with Netlify DB (Recommended)
+
+Netlify now offers a database service called Netlify DB that simplifies database management. This project includes integration with Netlify DB using the `@netlify/neon` package.
+
+For detailed instructions on deploying with Netlify DB, see [NETLIFY_DEPLOYMENT_INSTRUCTIONS.md](NETLIFY_DEPLOYMENT_INSTRUCTIONS.md).
+
+Benefits of Netlify DB:
+- Simplified database management
+- Automatic SSL certificates
+- Built-in connection pooling
+- Easy scaling
+- Integrated with Netlify's authentication
+
+### Option 2: Deploy to Netlify (Traditional Frontend Only)
 
 Deploying the frontend to Netlify is often easier and more reliable than static site hosting on Render. Follow the [Netlify Deployment Guide](NETLIFY_DEPLOYMENT_GUIDE.md) for detailed instructions.
 
@@ -28,7 +41,7 @@ Benefits of Netlify deployment:
 - Built-in analytics
 - Continuous deployment from Git
 
-### Option 2: Deploy to Render
+### Option 3: Deploy to Render
 
 Render offers free tiers for both web services and databases, making it ideal for testing.
 

@@ -1,5 +1,22 @@
 # EduSync Online Deployment Instructions
 
+This document provides step-by-step instructions for deploying EduSync to production environments, with options for both Render and Netlify deployments.
+
+## Prerequisites
+
+1. Either:
+   - A Render account (free tier available)
+   - OR a Netlify account
+2. A GitHub account
+3. Node.js and npm installed locally (for local testing)
+
+## Deployment Options
+
+### Option 1: Deploy to Render (Traditional Approach)
+
+```
+# EduSync Online Deployment Instructions
+
 This document provides step-by-step instructions for deploying EduSync to production environments, specifically focusing on Render deployment.
 
 ## Prerequisites

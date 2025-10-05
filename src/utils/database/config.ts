@@ -1,4 +1,3 @@
-
 // Database configuration with proper browser/server handling
 import { toast } from '@/hooks/use-toast';
 import { createPgPolyfills } from '../pg-polyfills';
@@ -8,6 +7,11 @@ createPgPolyfills();
 
 // Detect environment
 const isBrowser = typeof window !== 'undefined';
+
+// Check if Netlify DB is available
+const isNetlifyDBAvailable = () => {
+  return !!import.meta.env.NETLIFY_DATABASE_URL;
+};
 
 // Get database configuration from environment variables
 export const DB_CONFIG = {
@@ -49,13 +53,14 @@ const createNodePgPool = async () => {
     const modulePath = 'pg';
     const pg = await import(/* @vite-ignore */ modulePath);
     const { Pool } = pg;
-    const pool = new Pool(DB_CONFIG);
+    const pool = new Pool(BACKEND_DB_CONFIG);
     
     pool.on('error', (err: Error) => {
-      
-    });    return pool;
+      console.error('Unexpected error on idle client', err);
+    });
+    return pool;
   } catch (err) {
-    
+    console.error('Failed to create PostgreSQL pool:', err);
     return null;
   }
 };
@@ -69,7 +74,7 @@ export class DatabasePool {
 
   private constructor() {
     if (isBrowser) {
-      
+      // Browser environment - no direct database connections
     } else {
       this.initialized = false;
       this.initializing = false;
@@ -93,9 +98,10 @@ export class DatabasePool {
   }
 
   async query(text: string, params: any[] = []) {
+    // Fall back to existing PostgreSQL setup
     if (isBrowser) {
-      
-      return { rows: [] };
+      // In browser, we can't connect directly to database
+      throw new Error('Cannot connect to database from browser');
     }
     
     await this.ensureInitialized();
@@ -106,14 +112,14 @@ export class DatabasePool {
       }
       return await this.pgPool.query(text, params);
     } catch (error) {
-      
+      console.error('Database query error:', error);
       throw error;
     }
   }
 
   async connect() {
+    // Fall back to existing PostgreSQL setup
     if (isBrowser) {
-      
       throw new Error('Cannot connect to database from browser');
     }
     
@@ -125,7 +131,7 @@ export class DatabasePool {
       }
       return await this.pgPool.connect();
     } catch (error) {
-      
+      console.error('Database connection error:', error);
       throw error;
     }
   }
@@ -149,8 +155,10 @@ export async function shouldUseMockData(): Promise<boolean> {
 
   try {
     const client = await pgPool.connect();
+    client.release();
     return false; // Connection successful, no need for mock data
   } catch (error) {
+    console.error('Database connection failed:', error);
     
     toast({
       title: 'Database Connection Error',

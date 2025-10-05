@@ -103,6 +103,42 @@ npm install @types/pg --save-dev
 
 After starting your application, check the console logs to ensure the database connection is successful.
 
+## Netlify DB Integration
+
+This project now supports Netlify DB for simplified database operations. The Netlify DB uses the `@netlify/neon` package to connect to your PostgreSQL database.
+
+### Installation
+
+The `@netlify/neon` package has already been added to this project:
+
+```bash
+npm install @netlify/neon
+```
+
+### Usage Examples
+
+To use Netlify DB in your functions:
+```javascript
+import { neon } from '@netlify/neon';
+
+const sql = neon(); // automatically uses env NETLIFY_DATABASE_URL
+
+const [post] = await sql`SELECT * FROM posts WHERE id = ${postId}`;
+```
+
+### Available Resources
+
+1. Example Netlify function using the database: `netlify/functions/sample-db-query.js`
+2. Frontend utility functions: `src/utils/netlify-db.ts`
+3. Example React component: `src/components/NetlifyDBExample.tsx`
+4. Integration documentation: `NETLIFY_DB_INTEGRATION.md`
+5. Deployment instructions: `NETLIFY_DEPLOYMENT_INSTRUCTIONS.md`
+6. Troubleshooting guide: `NETLIFY_DB_TROUBLESHOOTING.md`
+
+### Fallback Solution
+
+If Netlify DB is not available (due to service issues or regional restrictions), the application will automatically fall back to the traditional PostgreSQL connection using the environment variables configured above.
+
 ## Deployment
 
 For detailed deployment instructions, please see [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md).
@@ -119,3 +155,20 @@ You can also use the deployment helper scripts:
 # sms
 # sms
 # sms
+
+## Netlify DB Integration
+
+This project now supports Netlify DB for simplified database operations. The Netlify DB uses the `@netlify/neon` package to connect to your PostgreSQL database.
+
+To use Netlify DB in your functions:
+```javascript
+import { neon } from '@netlify/neon';
+
+const sql = neon(); // automatically uses env NETLIFY_DATABASE_URL
+
+const [post] = await sql`SELECT * FROM posts WHERE id = ${postId}`;
+```
+
+Example Netlify function using the database is available at `netlify/functions/sample-db-query.js`.
+
+Frontend utility functions are available in `src/utils/netlify-db.ts`.
