@@ -11,7 +11,8 @@
     "preview": "vite preview",
     "verify": "node verify-build.js",
     "verify:build": "node verify-build.js",
-    "fix-deploy": "node fix-deployment.js"
+    "fix-deploy": "node fix-deployment.js",
+    "deploy:netlify": "node deploy-to-netlify.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

@@ -6,6 +6,8 @@ This guide explains how to deploy the EduSync school management system with a wo
 
 **For troubleshooting 502 Bad Gateway errors, see [DEPLOYMENT_TROUBLESHOOTING_502.md](DEPLOYMENT_TROUBLESHOOTING_502.md)**
 
+**For Netlify deployment instructions, see [NETLIFY_DEPLOYMENT_GUIDE.md](NETLIFY_DEPLOYMENT_GUIDE.md)**
+
 ## Architecture Overview
 
 The EduSync application consists of:
@@ -15,9 +17,18 @@ The EduSync application consists of:
 
 ## Deployment Options
 
-There are several platforms you can use to deploy this application. Below are instructions for two popular options:
+### Option 1: Deploy to Netlify (Recommended for Frontend)
 
-### Option 1: Deploy to Render (Recommended)
+Deploying the frontend to Netlify is often easier and more reliable than static site hosting on Render. Follow the [Netlify Deployment Guide](NETLIFY_DEPLOYMENT_GUIDE.md) for detailed instructions.
+
+Benefits of Netlify deployment:
+- Automatic SSL certificates
+- Global CDN for fast loading
+- Easy custom domain setup
+- Built-in analytics
+- Continuous deployment from Git
+
+### Option 2: Deploy to Render
 
 Render offers free tiers for both web services and databases, making it ideal for testing.
 
@@ -75,36 +86,6 @@ Render offers free tiers for both web services and databases, making it ideal fo
    VITE_APP_ENV=production
    ```
 5. Click "Create Static Site"
-
-### Option 2: Deploy Backend to Render and Frontend to Netlify
-
-#### Step 1: Deploy Backend to Render
-
-Follow steps 1-3 from Option 1 above.
-
-#### Step 2: Deploy Frontend to Netlify
-
-1. Build the frontend locally first:
-   ```bash
-   npm install
-   npm run build
-   ```
-2. Install Netlify CLI:
-   ```bash
-   npm install -g netlify-cli
-   ```
-3. Deploy to Netlify:
-   ```bash
-   netlify deploy --prod
-   ```
-   - Select the `dist` folder as the publish directory
-4. Set environment variables in Netlify:
-   - Go to your site settings → Environment Variables
-   - Add:
-     ```
-     VITE_API_URL=<your-render-backend-url>/api
-     VITE_APP_ENV=production
-     ```
 
 ## Automated Deployment Scripts
 

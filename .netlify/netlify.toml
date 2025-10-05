@@ -1,0 +1,59 @@
+headersOrigin = "config"
+redirectsOrigin = "config"
+plugins = []
+functionsDirectory = "D:\\ALL Data\\eit_sms\\netlify\\functions"
+functionsDirectoryOrigin = "config-v1"
+
+[dev]
+command = "npm run dev"
+port = 8888.0
+targetPort = 8080.0
+
+[template]
+
+[template.environment]
+VITE_API_URL = "Your backend API URL (e.g., https://your-backend.onrender.com/api)"
+
+[functions]
+
+[functions."*"]
+
+[build]
+publish = "D:\\ALL Data\\eit_sms\\dist"
+publishOrigin = "config"
+commandOrigin = "config"
+command = "npm run build"
+functions = "D:\\ALL Data\\eit_sms\\netlify\\functions"
+
+[build.environment]
+
+[build.processing]
+
+[build.processing.css]
+
+[build.processing.html]
+
+[build.processing.images]
+
+[build.processing.js]
+
+[build.services]
+
+[[headers]]
+for = "/*"
+
+[headers.values]
+X-Frame-Options = "DENY"
+X-Content-Type-Options = "nosniff"
+
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200.0
+force = false
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]

@@ -107,12 +107,15 @@ After starting your application, check the console logs to ensure the database c
 
 For detailed deployment instructions, please see [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md).
 
-For specific online deployment fixes and instructions, see [DEPLOYMENT_FIXES_SUMMARY.md](DEPLOYMENT_FIXES_SUMMARY.md) and [ONLINE_DEPLOYMENT_INSTRUCTIONS.md](ONLINE_DEPLOYMENT_INSTRUCTIONS.md).
+### Deploy to Netlify (Recommended for Frontend)
+
+For easy frontend deployment, follow the [Netlify Deployment Guide](NETLIFY_DEPLOYMENT_GUIDE.md).
 
 You can also use the deployment helper scripts:
 - On Windows: Run `deploy.bat`
 - On Linux/Mac: Run `deploy.sh`
 
-**Note**: For security reasons, never commit actual API keys to the repository. Use environment variables instead.# sms
+**Note**: For security reasons, never commit actual API keys to the repository. Use environment variables instead.
+# sms
 # sms
 # sms
