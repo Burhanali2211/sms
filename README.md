@@ -107,6 +107,8 @@ After starting your application, check the console logs to ensure the database c
 
 For detailed deployment instructions, please see [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md).
 
+For specific online deployment fixes and instructions, see [DEPLOYMENT_FIXES_SUMMARY.md](DEPLOYMENT_FIXES_SUMMARY.md) and [ONLINE_DEPLOYMENT_INSTRUCTIONS.md](ONLINE_DEPLOYMENT_INSTRUCTIONS.md).
+
 You can also use the deployment helper scripts:
 - On Windows: Run `deploy.bat`
 - On Linux/Mac: Run `deploy.sh`

@@ -1,206 +1,207 @@
-# Online Deployment Instructions for EduSync
+# EduSync Online Deployment Instructions
 
-This document provides step-by-step instructions to deploy EduSync online with a working database.
+This document provides step-by-step instructions for deploying EduSync to production environments, specifically focusing on Render deployment.
 
-## Overview
+## Prerequisites
 
-The EduSync application has three main components:
-1. **Frontend**: React application (runs in browser)
-2. **Backend**: Node.js/Express API server
-3. **Database**: PostgreSQL
+1. A Render account (free tier available)
+2. A GitHub account
+3. Node.js and npm installed locally (for local testing)
 
-## Quick Deployment Option (Recommended)
+## Deployment Steps
 
-The easiest way to deploy EduSync with a working database is using **Railway**:
+### 1. Database Setup on Render
 
-### Step 1: Prepare Your Code
+1. Go to [Render Dashboard](https://dashboard.render.com/)
+2. Click "New" → "PostgreSQL"
+3. Choose a name (e.g., "edusync-db")
+4. Select "Free" plan
+5. Click "Create Database"
+6. Once created, note the "External Database URL" - you'll need the host, database name, user, and password
 
-1. Push your code to a GitHub repository
-2. Make sure all files are committed and pushed
+### 2. Backend API Deployment
 
-### Step 2: Deploy to Railway
-
-1. Go to [railway.app](https://railway.app) and create a free account
-2. Click "New Project" → "Deploy from GitHub"
-3. Select your EduSync repository
-4. Railway will automatically detect it's a Node.js project
-5. In the service settings, set:
-   - Root directory: `backend`
+1. Fork this repository to your GitHub account
+2. On Render Dashboard, click "New" → "Web Service"
+3. Connect your GitHub repository
+4. Set the following configuration:
+   - Name: edusync-backend
+   - Environment: Node
+   - Build command: `npm install`
    - Start command: `npm start`
-
-### Step 3: Add PostgreSQL Database
-
-1. In Railway, click "New" → "Database" → "Add PostgreSQL"
-2. Railway will automatically inject database connection variables
-
-### Step 4: Configure Environment Variables
-
-In Railway, go to your service → Settings → Environment Variables and add:
-```
-JWT_SECRET=your-very-secure-secret-key-here
-NODE_ENV=production
-```
-
-### Step 5: Initialize Database Schema
-
-1. Once deployed, go to Railway → Your PostgreSQL database → Connect
-2. Use the provided connection string to connect with any PostgreSQL client (like pgAdmin or psql)
-3. Run the SQL scripts in this order:
-   - `sql/00_initialize_database.sql`
-   - `sql/01_create_core_tables.sql`
-   - `sql/02_insert_sample_data.sql` (optional, for sample data)
-
-### Step 6: Deploy Frontend to Netlify
-
-1. Build the frontend locally:
-   ```bash
-   npm run build
+   - Root directory: `backend`
+5. Add environment variables (click "Advanced" settings):
    ```
-2. Install Netlify CLI:
-   ```bash
-   npm install -g netlify-cli
-   ```
-3. Deploy:
-   ```bash
-   netlify deploy --prod
-   ```
-   - Choose the `dist` directory when prompted
-
-4. Set environment variables in Netlify:
-   - Go to your site → Site settings → Environment variables
-   - Add: `VITE_API_URL` = `https://your-railway-backend-url.up.railway.app/api`
-
-## Alternative: Manual Deployment
-
-### Backend Deployment Options:
-1. **Render** (render.com) - Free tier available
-2. **Heroku** (heroku.com) - Free tier available (limited)
-3. **DigitalOcean App Platform**
-4. **AWS Elastic Beanstalk**
-
-### Database Options:
-1. **Supabase** - PostgreSQL with free tier
-2. **Neon** - Serverless PostgreSQL with free tier
-3. **Railway PostgreSQL** (as above)
-4. **DigitalOcean PostgreSQL**
-
-## Detailed Deployment Steps
-
-### 1. Database Setup
-
-Choose one of these options:
-
-**Option A: Supabase (Recommended for ease of use)**
-1. Go to [supabase.com](https://supabase.com) and create a free account
-2. Create a new project
-3. Note the database connection details (host, port, database name, user, password)
-
-**Option B: Neon**
-1. Go to [neon.tech](https://neon.tech) and create a free account
-2. Create a new project
-3. Note the connection details
-
-### 2. Backend Deployment (Using Render as example)
-
-1. Fork your repository to GitHub
-2. Go to [render.com](https://render.com) and create a free account
-3. Create a new Web Service:
-   - Connect to your GitHub repository
-   - Set:
-     - Name: edusync-backend
-     - Environment: Node
-     - Build command: `npm install`
-     - Start command: `npm start`
-     - Root directory: `backend`
-4. Add environment variables:
-   ```
-   DB_HOST=your-database-host
+   DB_HOST=<from your database External Database URL>
    DB_PORT=5432
-   DB_NAME=your-database-name
-   DB_USER=your-database-user
-   DB_PASSWORD=your-database-password
-   JWT_SECRET=your-very-secure-secret-key-here
+   DB_NAME=<from your database External Database URL>
+   DB_USER=<from your database External Database URL>
+   DB_PASSWORD=<from your database External Database URL>
+   JWT_SECRET=<generate a strong secret>
    NODE_ENV=production
+   CLIENT_URL=https://your-frontend-url.onrender.com
    ```
+6. Click "Create Web Service"
 
 ### 3. Database Initialization
 
-After your database is set up, initialize the schema:
-
-1. Connect to your database using psql, pgAdmin, or any PostgreSQL client
-2. Run these scripts in order:
-   - `sql/00_initialize_database.sql`
-   - `sql/01_create_core_tables.sql`
-   - `sql/02_insert_sample_data.sql` (optional)
+1. Once your backend is deployed, initialize the database schema:
+   - Go to your backend service on Render
+   - Click "Connect" → "Connect to SSH"
+   - Run: `node init-database.js`
+   - This will create all tables and insert sample data
 
 ### 4. Frontend Deployment
 
-Build and deploy the frontend:
-
-1. Update `.env.production` file with your backend URL:
+1. On Render Dashboard, click "New" → "Static Site"
+2. Connect your GitHub repository
+3. Set the following configuration:
+   - Name: edusync-frontend
+   - Build command: `npm install && npm run build`
+   - Publish directory: `dist`
+4. Add environment variables:
    ```
-   VITE_API_URL=https://your-backend-url.com/api
+   VITE_API_URL=<your-render-backend-url>/api
+   VITE_APP_ENV=production
    ```
+5. Click "Create Static Site"
 
-2. Build the frontend:
+## Common Issues and Solutions
+
+### WebSocket Connection Errors
+
+**Problem**: `Firefox can't establish a connection to the server at wss://...`
+
+**Solution**: 
+- Ensure HMR is disabled in [vite.config.ts](file:///d:/ALL%20Data/eit_sms/vite.config.ts):
+  ```javascript
+  server: {
+    hmr: false
+  }
+  ```
+
+### MIME Type Errors
+
+**Problem**: `Loading module from ... was blocked because of a disallowed MIME type ("text/html")`
+
+**Solution**:
+1. Check that your [vite.config.ts](file:///d:/ALL%20Data/eit_sms/vite.config.ts) has the correct base path:
+   ```javascript
+   base: '/'
+   ```
+2. Ensure your [index.html](file:///d:/ALL%20Data/eit_sms/index.html) has the correct base tag:
+   ```html
+   <base href="/">
+   ```
+3. Clean and rebuild:
    ```bash
+   rm -rf dist
    npm run build
    ```
 
-3. Deploy the `dist` folder to any static hosting service:
-   - **Netlify**: Use `netlify deploy --prod`
-   - **Vercel**: Use `vercel --prod`
-   - **GitHub Pages**: Set up workflow to deploy `dist` folder
+### Module Not Found Errors
+
+**Problem**: Browser tries to load files from `node_modules/.vite/deps/`
+
+**Solution**:
+1. Make sure you're building for production, not development
+2. Check that you're deploying the `dist` folder, not the source code
+3. Verify your [render.yaml](file:///d:/ALL%20Data/eit_sms/render.yaml) has the correct `staticPublishPath: dist`
+
+## Verification Steps
+
+After deployment, verify that:
+
+1. Backend health check: Visit `<your-backend-url>/health` - should return JSON with status "OK"
+2. Frontend loads: Visit your frontend URL - should show the EduSync application
+3. API connection: Try logging in - should connect to the backend API
+4. Database connection: Try viewing dashboard data - should fetch from database
+
+## Troubleshooting Commands
+
+### Local Testing
+
+```bash
+# Test backend locally
+cd backend
+npm start
+
+# Test frontend locally
+npm run dev
+
+# Build frontend for production
+npm run build
+
+# Preview production build locally
+npm run preview
+```
+
+### Render Debugging
+
+```bash
+# Check backend logs
+# In Render dashboard, go to your backend service → Logs
+
+# Check frontend logs
+# In Render dashboard, go to your frontend service → Logs
+
+# Redeploy
+# In Render dashboard, go to your service → Manual Deploy → Deploy latest commit
+```
 
 ## Environment Variables Summary
 
-### Backend Required Variables:
-```
-DB_HOST=your-database-host
-DB_PORT=5432
-DB_NAME=your-database-name
-DB_USER=your-database-user
-DB_PASSWORD=your-database-password
-JWT_SECRET=your-very-secure-secret-key-here
-NODE_ENV=production
-```
-
-### Frontend Required Variables:
-```
-VITE_API_URL=https://your-backend-url.com/api
+### Backend (.env for local development)
+```env
+DB_HOST=localhost              # Database host
+DB_PORT=5432                   # Database port
+DB_NAME=edusync_db             # Database name
+DB_USER=postgres               # Database user
+DB_PASSWORD=admin              # Database password
+JWT_SECRET=your-secret-key     # JWT signing key
+NODE_ENV=production            # Environment
+CLIENT_URL=http://localhost:8080  # Frontend URL
 ```
 
-## Testing Your Deployment
+### Frontend (.env for local development)
+```env
+VITE_API_URL=http://localhost:3001/api  # Backend API URL
+VITE_APP_ENV=development                # Application environment
+```
 
-1. Visit your frontend URL - it should load the EduSync application
-2. Try logging in with sample credentials:
-   - Email: admin@edusync.com
-   - Password: admin123
-3. Check backend health: `https://your-backend-url.com/health`
+## Automated Fix Script
 
-## Troubleshooting
+Run the automated fix script to resolve common deployment issues:
 
-### Common Issues:
+```bash
+node fix-deployment.js
+```
 
-1. **CORS Errors**: Make sure your frontend URL is in the CORS configuration in `backend/server.js`
+This script will:
+1. Fix base path in [vite.config.ts](file:///d:/ALL%20Data/eit_sms/vite.config.ts)
+2. Fix base tag in [index.html](file:///d:/ALL%20Data/eit_sms/index.html)
+3. Fix API URL in [render.yaml](file:///d:/ALL%20Data/eit_sms/render.yaml)
+4. Clean the dist folder
 
-2. **Database Connection Failed**: 
-   - Check all database environment variables
-   - Ensure your database accepts connections from your backend service
+## Manual Verification Script
 
-3. **Blank Page on Frontend**: 
-   - Check browser console for errors
-   - Verify VITE_API_URL is set correctly
+Run the verification script to check your build configuration:
 
-4. **API Calls Failing**: 
-   - Check that backend service is running
-   - Verify the API_URL points to the correct backend
+```bash
+npm run verify:build
+```
 
-## Next Steps
+This script will:
+1. Check if dist folder exists
+2. Verify index.html is present
+3. Check assets folder
+4. Validate Vite configuration
+5. Confirm build scripts in package.json
 
-Once deployed successfully, consider:
-1. Setting up custom domains
-2. Adding SSL certificates
-3. Configuring monitoring and logging
-4. Setting up automated backups for your database
-5. Optimizing performance with caching
+## Notes
+
+1. Always use `npm run build` for production, not `npm run dev`
+2. The dist folder contains the production-ready build
+3. Never commit sensitive information to version control
+4. Update environment variables in Render dashboard, not in code
+5. After making configuration changes, redeploy your services

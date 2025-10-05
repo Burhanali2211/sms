@@ -10,6 +10,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "verify": "node verify-build.js",
+    "verify:build": "node verify-build.js",
     "fix-deploy": "node fix-deployment.js"
   },
   "dependencies": {

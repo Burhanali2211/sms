@@ -31,7 +31,7 @@ services:
     staticPublishPath: dist
     envVars:
       - key: VITE_API_URL
-        value: https://edusync-backend-yg5g.onrender.com/api
+        value: https://edusync-backend.onrender.com/api
     domains:
       - sms-kn5a.onrender.com
     headers:

@@ -2,6 +2,8 @@
 
 This guide explains how to deploy the EduSync school management system with a working database online.
 
+**For detailed online deployment instructions, see [ONLINE_DEPLOYMENT_INSTRUCTIONS.md](ONLINE_DEPLOYMENT_INSTRUCTIONS.md)**
+
 ## Architecture Overview
 
 The EduSync application consists of:

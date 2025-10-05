@@ -4,10 +4,12 @@ import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: './', // Essential for proper asset loading on static hosting
+  base: '/', // Changed from './' to '/' for proper static hosting
   server: {
-    host: "::",
+    host: true, // Changed from "::" to true for better compatibility
     port: 8080,
+    // Disable HMR for production deployment
+    hmr: false,
   },
   plugins: [
     react(),
