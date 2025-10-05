@@ -32,8 +32,10 @@ services:
     envVars:
       - key: VITE_API_URL
         value: https://edusync-backend.onrender.com/api
-    domains:
-      - sms-kn5a.onrender.com
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
     headers:
       - path: /*
         headers:

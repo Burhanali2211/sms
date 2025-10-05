@@ -4,6 +4,8 @@ This guide explains how to deploy the EduSync school management system with a wo
 
 **For detailed online deployment instructions, see [ONLINE_DEPLOYMENT_INSTRUCTIONS.md](ONLINE_DEPLOYMENT_INSTRUCTIONS.md)**
 
+**For troubleshooting 502 Bad Gateway errors, see [DEPLOYMENT_TROUBLESHOOTING_502.md](DEPLOYMENT_TROUBLESHOOTING_502.md)**
+
 ## Architecture Overview
 
 The EduSync application consists of:
