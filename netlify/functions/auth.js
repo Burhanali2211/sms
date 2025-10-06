@@ -1,6 +1,6 @@
 // Netlify function for authentication using Netlify DB
 import { neon } from '@netlify/neon';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 // Helper function to validate email format
 const isValidEmail = (email) => {
@@ -8,74 +8,87 @@ const isValidEmail = (email) => {
   return emailRegex.test(email);
 };
 
-export default async (req, res) => {
+exports.handler = async (event, context) => {
   // Set CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Content-Type': 'application/json',
+  };
 
   // Handle preflight requests
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers,
+      body: ''
+    };
   }
 
   try {
-    console.log('Auth function called with method:', req.method);
-    console.log('Request URL:', req.url);
+    console.log('Auth function called with method:', event.httpMethod);
+    console.log('Request path:', event.path);
     
     // Parse the request body
     let body = {};
-    if (req.method === 'POST') {
-      if (typeof req.body === 'string') {
-        body = JSON.parse(req.body);
-      } else if (typeof req.body === 'object') {
-        body = req.body;
+    if (event.httpMethod === 'POST') {
+      if (typeof event.body === 'string') {
+        body = JSON.parse(event.body);
+      } else if (typeof event.body === 'object') {
+        body = event.body;
       }
       console.log('Parsed body:', body);
     }
 
-    // Route handling based on URL path
-    const url = new URL(req.url, `http://${req.headers.host}`);
-    const path = url.pathname;
-    console.log('Request path:', path);
-
-    if (path === '/.netlify/functions/auth/login' && req.method === 'POST') {
+    if (event.path === '/.netlify/functions/auth/login' && event.httpMethod === 'POST') {
       // Login endpoint
       const { email, password } = body;
 
       // Validate input
       if (!email || !password) {
-        return res.status(400).json({
-          success: false,
-          message: 'Email and password are required'
-        });
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({
+            success: false,
+            message: 'Email and password are required'
+          })
+        };
       }
 
       if (!isValidEmail(email)) {
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid email format'
-        });
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({
+            success: false,
+            message: 'Invalid email format'
+          })
+        };
       }
 
       // Initialize Netlify DB connection
       // This automatically uses the NETLIFY_DATABASE_URL environment variable
       const sql = neon();
 
-      // Query user from database
+      // Query user from database (matching existing schema)
       const users = await sql`
-        SELECT id, email, password_hash, role, first_name, last_name 
+        SELECT id, email, password_hash, name, role
         FROM users 
         WHERE email = ${email} 
         LIMIT 1
       `;
 
       if (users.length === 0) {
-        return res.status(401).json({
-          success: false,
-          message: 'Invalid email or password'
-        });
+        return {
+          statusCode: 401,
+          headers,
+          body: JSON.stringify({
+            success: false,
+            message: 'Invalid email or password'
+          })
+        };
       }
 
       const user = users[0];
@@ -83,46 +96,66 @@ export default async (req, res) => {
       // Verify password
       const isPasswordValid = await bcrypt.compare(password, user.password_hash);
       if (!isPasswordValid) {
-        return res.status(401).json({
-          success: false,
-          message: 'Invalid email or password'
-        });
+        return {
+          statusCode: 401,
+          headers,
+          body: JSON.stringify({
+            success: false,
+            message: 'Invalid email or password'
+          })
+        };
       }
 
       // For demo purposes, we'll just return user info without JWT
       // In a production app, you'd generate and return a JWT token
       const { password_hash, ...userWithoutPassword } = user;
 
-      res.status(200).json({
-        success: true,
-        message: 'Login successful',
-        user: userWithoutPassword
-      });
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({
+          success: true,
+          message: 'Login successful',
+          user: userWithoutPassword
+        })
+      };
 
-    } else if (path === '/.netlify/functions/auth/register' && req.method === 'POST') {
+    } else if (event.path === '/.netlify/functions/auth/register' && event.httpMethod === 'POST') {
       // Registration endpoint
-      const { email, password, firstName, lastName } = body;
+      const { email, password, name } = body;
 
       // Validate input
-      if (!email || !password || !firstName || !lastName) {
-        return res.status(400).json({
-          success: false,
-          message: 'All fields are required'
-        });
+      if (!email || !password || !name) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({
+            success: false,
+            message: 'Email, password, and name are required'
+          })
+        };
       }
 
       if (!isValidEmail(email)) {
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid email format'
-        });
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({
+            success: false,
+            message: 'Invalid email format'
+          })
+        };
       }
 
       if (password.length < 6) {
-        return res.status(400).json({
-          success: false,
-          message: 'Password must be at least 6 characters long'
-        });
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({
+            success: false,
+            message: 'Password must be at least 6 characters long'
+          })
+        };
       }
 
       // Initialize Netlify DB connection
@@ -137,43 +170,59 @@ export default async (req, res) => {
       `;
 
       if (existingUsers.length > 0) {
-        return res.status(409).json({
-          success: false,
-          message: 'User with this email already exists'
-        });
+        return {
+          statusCode: 409,
+          headers,
+          body: JSON.stringify({
+            success: false,
+            message: 'User with this email already exists'
+          })
+        };
       }
 
       // Hash password
       const saltRounds = 10;
       const passwordHash = await bcrypt.hash(password, saltRounds);
 
-      // Insert new user
+      // Insert new user (matching existing schema with valid role)
       const [newUser] = await sql`
-        INSERT INTO users (email, password_hash, first_name, last_name, role)
-        VALUES (${email}, ${passwordHash}, ${firstName}, ${lastName}, 'user')
-        RETURNING id, email, first_name, last_name, role
+        INSERT INTO users (email, password_hash, name, role)
+        VALUES (${email}, ${passwordHash}, ${name}, 'student')
+        RETURNING id, email, name, role
       `;
 
-      res.status(201).json({
-        success: true,
-        message: 'User registered successfully',
-        user: newUser
-      });
+      return {
+        statusCode: 201,
+        headers,
+        body: JSON.stringify({
+          success: true,
+          message: 'User registered successfully',
+          user: newUser
+        })
+      };
 
     } else {
       // Handle unsupported routes
-      res.status(404).json({
-        success: false,
-        message: 'Endpoint not found'
-      });
+      return {
+        statusCode: 404,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          message: 'Endpoint not found'
+        })
+      };
     }
   } catch (error) {
     console.error('Auth function error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error',
-      error: error.message,
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
-    });
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({
+        success: false,
+        message: 'Internal server error',
+        error: error.message,
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      })
+    };
   }
 };

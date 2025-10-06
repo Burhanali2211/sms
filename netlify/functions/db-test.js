@@ -1,7 +1,7 @@
 // Netlify function to test database connection
 import { neon } from '@netlify/neon';
 
-export default async (req, res) => {
+exports.handler = async (event, context) => {
   try {
     console.log('Starting database test function');
     
@@ -17,6 +17,18 @@ export default async (req, res) => {
     
     const { version } = result[0];
     console.log('Database version:', version);
+    
+    // Check what roles exist in the users table
+    try {
+      console.log('Checking existing user roles');
+      const roles = await sql`
+        SELECT DISTINCT role 
+        FROM users
+      `;
+      console.log('Existing roles:', roles);
+    } catch (roleError) {
+      console.log('Error checking roles:', roleError.message);
+    }
     
     // Also test if we can access the users table
     let userCount = 0;
@@ -38,7 +50,13 @@ export default async (req, res) => {
     };
     
     console.log('Sending successful response:', response);
-    res.status(200).json(response);
+    return {
+      statusCode: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(response)
+    };
   } catch (error) {
     console.error('Database connection error:', error);
     
@@ -51,6 +69,12 @@ export default async (req, res) => {
     };
     
     console.log('Sending error response:', errorResponse);
-    res.status(500).json(errorResponse);
+    return {
+      statusCode: 500,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(errorResponse)
+    };
   }
 };

@@ -79,7 +79,7 @@ export function useDashboardData() {
       }
       
       // Transform backend stats to frontend format
-      const transformedStats: DashboardStat[] = ((statsResponse.data as any[]) || []).map(stat => ({
+      const transformedStats: DashboardStat[] = ((statsResponse.data as BackendDashboardStat[]) || []).map(stat => ({
         title: stat.label,
         value: stat.value,
         description: stat.description
@@ -92,7 +92,7 @@ export function useDashboardData() {
         throw new Error(notificationsResponse.error);
       }
       // Transform backend notifications to frontend format
-      const transformedNotifications: Notification[] = ((notificationsResponse.data as any[]) || []).map((notif: any) => ({
+      const transformedNotifications: Notification[] = ((notificationsResponse.data as BackendNotification[]) || []).map((notif: any) => ({
         id: notif.id,
         title: notif.title,
         message: notif.message,
@@ -103,12 +103,12 @@ export function useDashboardData() {
       setNotifications(transformedNotifications);
 
       // Fetch events
-      const eventsResponse = await apiClient.getEvents(user.id);
+      const eventsResponse = await apiClient.getEvents(user.id, user.role);
       if (eventsResponse.error) {
         throw new Error(eventsResponse.error);
       }
       // Transform backend events to frontend format
-      const transformedEvents: Event[] = ((eventsResponse.data as any[]) || []).map((event: any) => ({
+      const transformedEvents: Event[] = ((eventsResponse.data as BackendEvent[]) || []).map((event: any) => ({
         id: event.id,
         title: event.title,
         description: event.description,

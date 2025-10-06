@@ -442,6 +442,10 @@ class ApiClient {
     return this.get('/users');
   }
 
+  async getUser(id: string) {
+    return this.get(`/users/${id}`);
+  }
+
   async createUser(userData: any) {
     return this.post('/users', userData);
   }
@@ -456,42 +460,51 @@ class ApiClient {
 
   // Dashboard operations
   async getDashboardStats(role: string, userId?: string) {
-    const endpoint = userId ? `/dashboard/stats/${role}/${userId}` : `/dashboard/stats/${role}`;
+    const endpoint = userId ? `/dashboard/stats?role=${role}&user_id=${userId}` : `/dashboard/stats?role=${role}`;
     return this.get(endpoint);
   }
 
   async getNotifications(userId: string) {
-    return this.get(`/dashboard/notifications/${userId}`);
+    return this.get(`/dashboard/notifications?user_id=${userId}`);
   }
 
-  async getEvents(userId: string) {
-    return this.get(`/dashboard/events/${userId}`);
-  }
-
-  async markNotificationRead(notificationId: string, userId: string) {
-    return this.put(`/dashboard/notifications/${notificationId}/read`, { userId });
-  }
-
-  // Calendar operations
-  async getCalendarEvents(startDate?: string, endDate?: string) {
-    const params = new URLSearchParams();
+  async getEvents(userId: string, role: string, startDate?: string, endDate?: string) {
+    const params = new URLSearchParams({
+      user_id: userId,
+      role: role
+    });
+    
     if (startDate) params.append('start_date', startDate);
     if (endDate) params.append('end_date', endDate);
     
+    return this.get(`/dashboard/events?${params.toString()}`);
+  }
+
+  async markNotificationRead(notificationId: string, userId: string) {
+    return this.put(`/notifications/${notificationId}`, { user_id: userId });
+  }
+
+  // Calendar operations
+  async getCalendarEvents(startDate?: string, endDate?: string, userId?: string) {
+    const params = new URLSearchParams();
+    if (startDate) params.append('start_date', startDate);
+    if (endDate) params.append('end_date', endDate);
+    if (userId) params.append('user_id', userId);
+    
     const query = params.toString() ? `?${params.toString()}` : '';
-    return this.get(`/calendar/events${query}`);
+    return this.get(`/events${query}`);
   }
 
   async createEvent(eventData: any) {
-    return this.post('/calendar/events', eventData);
+    return this.post('/events', eventData);
   }
 
   async updateEvent(id: string, eventData: any) {
-    return this.put(`/calendar/events/${id}`, eventData);
+    return this.put(`/events/${id}`, eventData);
   }
 
   async deleteEvent(id: string) {
-    return this.delete(`/calendar/events/${id}`);
+    return this.delete(`/events/${id}`);
   }
 
   // Transportation operations

@@ -57,7 +57,7 @@ const FunctionalNotifications = () => {
       setNotifications(transformedNotifications);
       setUnreadCount(transformedNotifications.filter(n => !n.is_read).length);
     } catch (error) {
-      
+      console.error('Notifications widget error:', error);
       toast({
         title: 'Error',
         description: 'Failed to load notifications',
@@ -86,10 +86,11 @@ const FunctionalNotifications = () => {
         title: 'Success',
         description: 'Notification marked as read',
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Mark as read error:', error);
       toast({
         title: 'Error',
-        description: 'Failed to mark notification as read',
+        description: error.message || 'Failed to mark notification as read',
         variant: 'destructive',
       });
     }
@@ -99,10 +100,10 @@ const FunctionalNotifications = () => {
     if (!user) return;
     
     try {
-      const unreadNotifications = notifications.filter(n => !n.is_read);
-      
-      for (const notification of unreadNotifications) {
-        await apiClient.markNotificationRead(notification.id, user.id);
+      // Use the dedicated endpoint for marking all as read
+      const response = await apiClient.put('/notifications/mark-all-read', { user_id: user.id });
+      if (response.error) {
+        throw new Error(response.error);
       }
       
       setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
@@ -112,10 +113,11 @@ const FunctionalNotifications = () => {
         title: 'Success',
         description: 'All notifications marked as read',
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Mark all as read error:', error);
       toast({
         title: 'Error',
-        description: 'Failed to mark all notifications as read',
+        description: error.message || 'Failed to mark all notifications as read',
         variant: 'destructive',
       });
     }

@@ -61,7 +61,7 @@ const FunctionalCalendarWidget = () => {
       
       setEvents(transformedEvents);
     } catch (error) {
-      
+      console.error('Calendar widget error:', error);
       toast({
         title: 'Error',
         description: 'Failed to load events',
@@ -74,7 +74,13 @@ const FunctionalCalendarWidget = () => {
 
   const handleCreateEvent = async () => {
     try {
-      const response = await apiClient.createEvent(formData);
+      // Add created_by to the form data
+      const eventData = {
+        ...formData,
+        created_by: user?.id
+      };
+      
+      const response = await apiClient.createEvent(eventData);
       if (response.error) {
         throw new Error(response.error);
       }
@@ -87,10 +93,11 @@ const FunctionalCalendarWidget = () => {
       setIsCreateDialogOpen(false);
       resetForm();
       fetchEvents();
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Create event error:', error);
       toast({
         title: 'Error',
-        description: 'Failed to create event',
+        description: error.message || 'Failed to create event',
         variant: 'destructive',
       });
     }
@@ -113,10 +120,11 @@ const FunctionalCalendarWidget = () => {
       setEditingEvent(null);
       resetForm();
       fetchEvents();
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Update event error:', error);
       toast({
         title: 'Error',
-        description: 'Failed to update event',
+        description: error.message || 'Failed to update event',
         variant: 'destructive',
       });
     }
@@ -135,10 +143,11 @@ const FunctionalCalendarWidget = () => {
       });
       
       fetchEvents();
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Delete event error:', error);
       toast({
         title: 'Error',
-        description: 'Failed to delete event',
+        description: error.message || 'Failed to delete event',
         variant: 'destructive',
       });
     }
@@ -161,8 +170,8 @@ const FunctionalCalendarWidget = () => {
     setFormData({
       title: event.title,
       description: event.description || '',
-      start_date: event.start_date.split('T')[0],
-      end_date: event.end_date.split('T')[0],
+      start_date: event.start_date,
+      end_date: event.end_date,
       location: event.location || '',
       event_type: event.event_type || 'event',
       is_public: event.is_public !== undefined ? event.is_public : true
@@ -236,7 +245,7 @@ const FunctionalCalendarWidget = () => {
                     <Label htmlFor="start_date">Start Date</Label>
                     <Input
                       id="start_date"
-                      type="date"
+                      type="datetime-local"
                       value={formData.start_date}
                       onChange={(e) => setFormData({...formData, start_date: e.target.value})}
                     />
@@ -245,7 +254,7 @@ const FunctionalCalendarWidget = () => {
                     <Label htmlFor="end_date">End Date</Label>
                     <Input
                       id="end_date"
-                      type="date"
+                      type="datetime-local"
                       value={formData.end_date}
                       onChange={(e) => setFormData({...formData, end_date: e.target.value})}
                     />

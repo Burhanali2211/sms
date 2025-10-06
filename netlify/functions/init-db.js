@@ -1,102 +1,154 @@
 // Netlify function to initialize database schema
 import { neon } from '@netlify/neon';
+import bcrypt from 'bcryptjs';
 
-export default async (req, res) => {
+exports.handler = async (event, context) => {
   try {
     // Only allow POST requests
-    if (req.method !== 'POST') {
-      return res.status(405).json({
-        success: false,
-        message: 'Method not allowed. Use POST to initialize database.'
-      });
+    if (event.httpMethod !== 'POST') {
+      return {
+        statusCode: 405,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          success: false,
+          message: 'Method not allowed. Use POST to initialize database.'
+        })
+      };
     }
 
     // Initialize Netlify DB connection
     const sql = neon();
 
-    // Create users table if it doesn't exist
+    // Check if tables already exist by querying one
+    const tableCheck = await sql`
+      SELECT table_name 
+      FROM information_schema.tables 
+      WHERE table_schema = 'public' AND table_name = 'users'
+    `;
+    
+    if (tableCheck.length > 0) {
+      return {
+        statusCode: 200,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          success: true,
+          message: 'Database already initialized!',
+          tables: ['users', 'events', 'notifications', 'user_notifications']
+        })
+      };
+    }
+
+    // Create users table
     await sql`
-      CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
+      CREATE TABLE users (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         email VARCHAR(255) UNIQUE NOT NULL,
         password_hash VARCHAR(255) NOT NULL,
-        first_name VARCHAR(100),
-        last_name VARCHAR(100),
-        role VARCHAR(50) DEFAULT 'user',
+        name VARCHAR(255) NOT NULL,
+        role VARCHAR(50) NOT NULL CHECK (role IN ('admin', 'super-admin', 'principal', 'school-admin', 'teacher', 'student', 'parent', 'financial', 'library', 'labs', 'admission', 'club')),
+        status VARCHAR(50) DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'suspended')),
+        avatar_url TEXT,
         phone VARCHAR(20),
         address TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        date_of_birth DATE,
+        emergency_contact VARCHAR(100),
+        last_login TIMESTAMP WITH TIME ZONE,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
       )
     `;
 
-    // Create an index on email for faster lookups
+    // Create events table
     await sql`
-      CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)
-    `;
-
-    // Create events table if it doesn't exist
-    await sql`
-      CREATE TABLE IF NOT EXISTS events (
-        id SERIAL PRIMARY KEY,
+      CREATE TABLE events (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         title VARCHAR(255) NOT NULL,
         description TEXT,
-        start_date TIMESTAMP NOT NULL,
-        end_date TIMESTAMP NOT NULL,
+        start_date TIMESTAMP WITH TIME ZONE NOT NULL,
+        end_date TIMESTAMP WITH TIME ZONE NOT NULL,
         location VARCHAR(255),
         event_type VARCHAR(100),
+        color VARCHAR(7) DEFAULT '#3b82f6',
+        created_by UUID REFERENCES users(id),
         is_public BOOLEAN DEFAULT true,
-        created_by INTEGER REFERENCES users(id),
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
       )
     `;
 
-    // Create notifications table if it doesn't exist
+    // Create notifications table
     await sql`
-      CREATE TABLE IF NOT EXISTS notifications (
-        id SERIAL PRIMARY KEY,
-        user_id INTEGER REFERENCES users(id),
+      CREATE TABLE notifications (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         title VARCHAR(255) NOT NULL,
         message TEXT NOT NULL,
         type VARCHAR(50) DEFAULT 'info',
-        is_read BOOLEAN DEFAULT false,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        created_by UUID REFERENCES users(id),
+        action_url TEXT,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
       )
     `;
 
-    // Insert a default superadmin user if none exists
-    const superadminEmail = 'superadmin@edusync.com';
-    const existingUsers = await sql`
-      SELECT id FROM users WHERE email = ${superadminEmail} LIMIT 1
+    // Create user_notifications table (many-to-many relationship)
+    await sql`
+      CREATE TABLE user_notifications (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        notification_id UUID REFERENCES notifications(id) ON DELETE CASCADE,
+        user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+        is_read BOOLEAN DEFAULT false,
+        read_at TIMESTAMP WITH TIME ZONE,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+      )
     `;
 
-    if (existingUsers.length === 0) {
-      // Note: In a real application, you would use a proper password hashing library
-      // For this example, we're using a simple hash
-      const bcrypt = require('bcrypt');
-      const saltRounds = 10;
-      const defaultPassword = 'password123';
-      const passwordHash = await bcrypt.hash(defaultPassword, saltRounds);
-      
-      await sql`
-        INSERT INTO users (email, password_hash, first_name, last_name, role)
-        VALUES (${superadminEmail}, ${passwordHash}, 'Super', 'Admin', 'super-admin')
-      `;
-    }
+    // Create indexes
+    await sql`CREATE INDEX idx_users_email ON users(email)`;
+    await sql`CREATE INDEX idx_events_dates ON events(start_date, end_date)`;
+    await sql`CREATE INDEX idx_notifications_created_by ON notifications(created_by)`;
+    await sql`CREATE INDEX idx_user_notifications_user_id ON user_notifications(user_id)`;
+    await sql`CREATE INDEX idx_user_notifications_is_read ON user_notifications(is_read)`;
 
-    res.status(200).json({
-      success: true,
-      message: 'Database initialized successfully!',
-      tables: ['users', 'events', 'notifications'],
-      superadminCreated: existingUsers.length === 0
-    });
+    // Insert a default superadmin user
+    const superadminEmail = 'superadmin@edusync.com';
+    const saltRounds = 10;
+    const defaultPassword = 'password123';
+    const passwordHash = await bcrypt.hash(defaultPassword, saltRounds);
+    
+    const [newUser] = await sql`
+      INSERT INTO users (email, password_hash, name, role)
+      VALUES (${superadminEmail}, ${passwordHash}, 'Super Administrator', 'super-admin')
+      RETURNING id, email, name, role
+    `;
+
+    return {
+      statusCode: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        success: true,
+        message: 'Database initialized successfully!',
+        tables: ['users', 'events', 'notifications', 'user_notifications'],
+        superadmin: newUser
+      })
+    };
   } catch (error) {
     console.error('Database initialization error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Database initialization failed',
-      error: error.message
-    });
+    return {
+      statusCode: 500,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        success: false,
+        message: 'Database initialization failed',
+        error: error.message
+      })
+    };
   }
 };
