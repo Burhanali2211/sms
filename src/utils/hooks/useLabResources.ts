@@ -2,11 +2,7 @@ import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 import { LabResource } from "@/pages/dashboard/admin/LabResourceTable";
 import { NewResource } from "@/pages/dashboard/admin/AddResourceDialog";
-
-const mockResources: LabResource[] = [
-  { id: "1", name: "Microscope", quantity: 15, available: 10, type: "Science", lastMaintenance: "2023-01-15" },
-  { id: "2", name: "Laptop", quantity: 30, available: 25, type: "Technology", lastMaintenance: "2023-04-10" }
-];
+import { MOCK_LAB_RESOURCES } from "@/data/mock/labs";
 
 export function useLabResources() {
   const [resources, setResources] = useState<LabResource[]>([]);
@@ -15,9 +11,9 @@ export function useLabResources() {
 
   useEffect(() => {
     setTimeout(() => {
-      setResources(mockResources);
+      setResources(MOCK_LAB_RESOURCES as LabResource[]);
       setResourcesLoading(false);
-    }, 500);
+    }, 400);
   }, []);
 
   const dashboardStats = null;
