@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { apiClient } from '@/utils/api/client';
 import { toast } from '@/hooks/use-toast';
+import { findDemoUser } from '@/data/mock/users';
 
 interface User {
   id: string;
@@ -42,15 +43,36 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const initializeAuth = async () => {
     if (initialized) return;
-    
+
     try {
       const token = localStorage.getItem('authToken');
-      if (token) {
+      // Restore demo session if token is a demo token
+      if (token && token.startsWith('demo-token-')) {
+        const demoEmail = localStorage.getItem('demoEmail');
+        const demoUser = demoEmail ? findDemoUser(demoEmail, 'demo123') : null;
+        if (demoUser) {
+          setUser({
+            id: demoUser.id,
+            email: demoUser.email,
+            name: demoUser.name,
+            role: demoUser.role,
+            status: demoUser.status,
+            phone: demoUser.phone,
+            avatar: demoUser.avatar,
+            last_login: demoUser.last_login,
+            created_at: demoUser.created_at,
+          });
+          setIsLoading(false);
+          setInitialized(true);
+          return;
+        }
+      }
+
+      if (token && !token.startsWith('demo-token-')) {
         apiClient.setToken(token);
         const response = await apiClient.verifyToken(token);
-        
+
         if (response.error) {
-          // Token is invalid, clear it
           localStorage.removeItem('authToken');
           apiClient.clearToken();
           setUser(null);
@@ -61,7 +83,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser(null);
       }
     } catch (error) {
-      
       localStorage.removeItem('authToken');
       apiClient.clearToken();
       setUser(null);
@@ -74,6 +95,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       setIsLoading(true);
+
+      // Demo credential bypass — no backend needed
+      const demoUser = findDemoUser(email, password);
+      if (demoUser) {
+        const demoToken = `demo-token-${demoUser.id}-${Date.now()}`;
+        const userData: User = {
+          id: demoUser.id,
+          email: demoUser.email,
+          name: demoUser.name,
+          role: demoUser.role,
+          status: demoUser.status,
+          phone: demoUser.phone,
+          avatar: demoUser.avatar,
+          last_login: new Date().toISOString(),
+          created_at: demoUser.created_at,
+        };
+        setUser(userData);
+        localStorage.setItem('authToken', demoToken);
+        localStorage.setItem('demoEmail', email.toLowerCase());
+        toast({ title: `Welcome, ${userData.name}!`, description: `Logged in as ${userData.role} (demo mode)` });
+        return true;
+      }
+
       const response = await apiClient.login(email, password);
       
       if (response.error) {
@@ -147,6 +191,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('authToken');
+    localStorage.removeItem('demoEmail');
     apiClient.clearToken();
     
     toast({

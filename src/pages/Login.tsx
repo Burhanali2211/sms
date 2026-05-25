@@ -5,35 +5,34 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserRole } from "@/types/dashboard";
 import { toast } from "@/hooks/use-toast";
-import { Eye, EyeOff, Lock, User, GraduationCap, Shield, BookOpen, Users } from "lucide-react";
+import { Eye, EyeOff, Lock, User, GraduationCap, Shield, BookOpen, Users, Zap } from "lucide-react";
+import { DEMO_CREDENTIALS, DEMO_PASSWORD } from "@/data/mock/users";
+
+const QUICK_ROLES = [
+  { key: 'super-admin', label: 'Super Admin', color: 'bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-200' },
+  { key: 'admin', label: 'Admin', color: 'bg-indigo-100 text-indigo-800 border-indigo-200 hover:bg-indigo-200' },
+  { key: 'principal', label: 'Principal', color: 'bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200' },
+  { key: 'teacher', label: 'Teacher', color: 'bg-teal-100 text-teal-800 border-teal-200 hover:bg-teal-200' },
+  { key: 'student', label: 'Student', color: 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200' },
+  { key: 'financial', label: 'Finance', color: 'bg-amber-100 text-amber-800 border-amber-200 hover:bg-amber-200' },
+  { key: 'library', label: 'Librarian', color: 'bg-rose-100 text-rose-800 border-rose-200 hover:bg-rose-200' },
+  { key: 'admission', label: 'Admissions', color: 'bg-orange-100 text-orange-800 border-orange-200 hover:bg-orange-200' },
+];
 
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { login, isLoading, isAuthenticated } = useAuth();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [role, setRole] = useState<UserRole>("student");
+  const [email, setEmail] = useState("superadmin@demo.com");
+  const [password, setPassword] = useState(DEMO_PASSWORD);
+  const [role, setRole] = useState<UserRole>("super-admin");
   const [showPassword, setShowPassword] = useState(false);
-  
-  const demoAccounts = {
-    student: { email: "student@edusync.com", password: "password123" },
-    teacher: { email: "teacher@edusync.com", password: "password123" },
-    principal: { email: "principal@edusync.com", password: "password123" },
-    admin: { email: "admin@edusync.com", password: "password123" },
-    financial: { email: "financial@edusync.com", password: "password123" },
-    library: { email: "library@edusync.com", password: "password123" },
-    labs: { email: "labs@edusync.com", password: "password123" },
-    admission: { email: "admission@edusync.com", password: "password123" },
-    "school-admin": { email: "schooladmin@edusync.com", password: "password123" },
-    club: { email: "club@edusync.com", password: "password123" },
-    "super-admin": { email: "superadmin@edusync.com", password: "password123" },
-  };
 
-  const roleInfo = {
+  const roleInfo: Record<string, { icon: any; title: string; description: string }> = {
     student: { icon: BookOpen, title: "Student Portal", description: "Access courses, grades, and academic progress" },
     teacher: { icon: Users, title: "Teacher Dashboard", description: "Manage classes and student evaluations" },
     admin: { icon: Shield, title: "Admin Panel", description: "Complete school management system" },
@@ -46,7 +45,7 @@ const Login = () => {
     club: { icon: Users, title: "Club Management", description: "Extracurricular activities management" },
     "super-admin": { icon: Shield, title: "Super Admin", description: "Complete system administration" },
   };
-  
+
   useEffect(() => {
     if (isAuthenticated) {
       const from = location.state?.from?.pathname || "/dashboard";
@@ -54,12 +53,14 @@ const Login = () => {
     }
   }, [isAuthenticated, navigate, location]);
 
-  useEffect(() => {
-    if (demoAccounts[role]) {
-      setEmail(demoAccounts[role].email);
-      setPassword(demoAccounts[role].password);
+  const handleQuickLogin = (roleKey: string) => {
+    const cred = DEMO_CREDENTIALS.find(c => c.role === roleKey);
+    if (cred) {
+      setEmail(cred.email);
+      setPassword(DEMO_PASSWORD);
+      setRole(cred.role as UserRole);
     }
-  }, [role]);
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -147,29 +148,30 @@ const Login = () => {
             </CardHeader>
             
             <CardContent className="space-y-6">
-              {/* Quick Access Buttons */}
-              <div className="space-y-3">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 text-center">
-                  Quick Demo Access
-                </p>
-                
-                <div className="grid grid-cols-2 gap-2">
-                  {Object.entries(demoAccounts).map(([roleKey, _]) => (
-                    <Button
-                      key={roleKey}
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setRole(roleKey as UserRole)}
-                      className={`capitalize text-xs transition-all ${
-                        role === roleKey 
-                          ? 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-300' 
-                          : 'hover:bg-gray-50 dark:hover:bg-gray-800'
-                      }`}
+              {/* Demo Quick Access Panel */}
+              <div className="rounded-xl border border-blue-100 bg-blue-50/60 dark:bg-blue-900/10 dark:border-blue-900/30 p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Zap className="h-4 w-4 text-blue-600" />
+                  <p className="text-sm font-semibold text-blue-800 dark:text-blue-300">Demo — One-Click Login</p>
+                  <Badge variant="outline" className="ml-auto text-xs border-blue-200 text-blue-600">password: demo123</Badge>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {QUICK_ROLES.map(({ key, label, color }) => (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => handleQuickLogin(key)}
+                      className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors cursor-pointer ${color} ${role === key ? 'ring-2 ring-offset-1 ring-blue-400' : ''}`}
                     >
-                      {roleKey.replace('-', ' ')}
-                    </Button>
+                      {label}
+                    </button>
                   ))}
                 </div>
+                {email && (
+                  <p className="text-xs text-blue-600/80 dark:text-blue-400/70 font-mono truncate">
+                    → {email}
+                  </p>
+                )}
               </div>
 
               <div className="relative">
@@ -268,11 +270,6 @@ const Login = () => {
               </form>
 
               <div className="text-center space-y-4">
-                <div className="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
-                  <p className="font-medium mb-1 text-gray-700 dark:text-gray-300">Demo Credentials</p>
-                  <p>Email: [role]@edusync.com</p>
-                  <p>Password: password123</p>
-                </div>
                 
                 <Button
                   variant="ghost"

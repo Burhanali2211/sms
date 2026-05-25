@@ -43,8 +43,18 @@ const FunctionalCalendarWidget = () => {
         throw new Error(response.error);
       }
       
+      // Handle both array and object responses
+      let eventsData = response.data;
+      if (!Array.isArray(eventsData) && eventsData !== undefined) {
+        // If it's a single event or wrapped data, extract the array
+        eventsData = Array.isArray(eventsData) ? eventsData : [eventsData];
+      } else if (eventsData === undefined && Array.isArray(response)) {
+        // Direct array response
+        eventsData = response;
+      }
+      
       // Transform the response data to match CalendarEvent interface
-      const transformedEvents: CalendarEvent[] = ((response.data as any[]) || []).map((event: any) => ({
+      const transformedEvents: CalendarEvent[] = ((eventsData as any[]) || []).map((event: any) => ({
         id: event.id,
         title: event.title,
         description: event.description,
@@ -64,7 +74,7 @@ const FunctionalCalendarWidget = () => {
       console.error('Calendar widget error:', error);
       toast({
         title: 'Error',
-        description: 'Failed to load events',
+        description: 'Failed to load events: ' + (error as Error).message,
         variant: 'destructive',
       });
     } finally {

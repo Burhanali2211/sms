@@ -1,28 +1,28 @@
-
 import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 import { LabResource } from "@/pages/dashboard/admin/LabResourceTable";
 import { NewResource } from "@/pages/dashboard/admin/AddResourceDialog";
-import { useDatabaseTable, useDatabaseView } from "@/hooks/use-database-connection";
+
+const mockResources: LabResource[] = [
+  { id: "1", name: "Microscope", quantity: 15, available: 10, type: "Science", lastMaintenance: "2023-01-15" },
+  { id: "2", name: "Laptop", quantity: 30, available: 25, type: "Technology", lastMaintenance: "2023-04-10" }
+];
 
 export function useLabResources() {
-  // Get lab resources from database
-  const { 
-    data: resources, 
-    isLoading: resourcesLoading, 
-    error: resourcesError,
-    create: createResource,
-    update: updateResource,
-    remove: removeResource,
-    refresh: refreshResources
-  } = useDatabaseTable<LabResource>("lab_resources");
-  
-  // Get additional dashboard stats from database view
-  const {
-    data: dashboardStats,
-    isLoading: statsLoading,
-    error: statsError
-  } = useDatabaseView("lab_resources_dashboard_view", {}, {}, 60000);
+  const [resources, setResources] = useState<LabResource[]>([]);
+  const [resourcesLoading, setResourcesLoading] = useState(true);
+  const [resourcesError, setResourcesError] = useState(null);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setResources(mockResources);
+      setResourcesLoading(false);
+    }, 500);
+  }, []);
+
+  const dashboardStats = null;
+  const statsLoading = false;
+  const statsError = null;
 
   // Calculate dashboard stats
   const totalResources = resources ? resources.length : 0;
@@ -42,14 +42,14 @@ export function useLabResources() {
   // Add new resource handler
   const handleAddResource = async (newResource: NewResource) => {
     try {
-      await createResource(newResource);
+      const resourceToAdd = { ...newResource, id: Math.random().toString() } as LabResource;
+      setResources(prev => [...prev, resourceToAdd]);
       toast({
         title: "Success",
         description: "Resource added successfully",
       });
       return Promise.resolve();
     } catch (error) {
-      
       return Promise.reject(error);
     }
   };
@@ -57,10 +57,9 @@ export function useLabResources() {
   // Delete resource handler
   const handleDeleteResource = async (id: string) => {
     try {
-      await removeResource(id);
+      setResources(prev => prev.filter(r => r.id !== id));
       return Promise.resolve();
     } catch (error) {
-      
       return Promise.reject(error);
     }
   };
@@ -69,18 +68,19 @@ export function useLabResources() {
   const handleScheduleMaintenance = async (id: string) => {
     try {
       const today = new Date().toISOString().split('T')[0];
-      await updateResource(id, { lastMaintenance: today });
+      setResources(prev => prev.map(r => r.id === id ? { ...r, lastMaintenance: today } : r));
       toast({
         title: "Maintenance Scheduled",
         description: "Maintenance has been scheduled for today.",
       });
       return Promise.resolve();
     } catch (error) {
-      
       return Promise.reject(error);
     }
   };
   
+  const refreshResources = async () => {};
+
   return {
     resources,
     resourcesLoading,

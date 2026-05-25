@@ -10,6 +10,7 @@ import QuickActions from "@/components/dashboard/QuickActions";
 import FunctionalNotifications from "@/components/dashboard/FunctionalNotifications";
 import FunctionalCalendarWidget from "@/components/dashboard/FunctionalCalendarWidget";
 import DataAnalyticsWidget from "@/components/dashboard/DataAnalyticsWidget";
+import SuperAdminDashboard from "@/pages/dashboard/admin/SuperAdminDashboard";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
 import LoadingSpinner from "@/components/ui/loading-spinner";
 import ErrorBoundary from "@/components/ui/error-boundary";
@@ -39,29 +40,35 @@ const Dashboard = () => {
       <DashboardLayout>
         <DashboardHeader title="Dashboard" />
 
-        <main className="flex-1 overflow-auto dashboard-content p-6 space-y-6">
-          {/* Main Stats */}
-          <DashboardStats stats={stats} isStatsLoading={dashboardLoading} />
+        <main className="flex-1 overflow-auto dashboard-content p-6 space-y-6 bg-slate-50/50">
+          {(user.role === 'super-admin' || user.role === 'admin') ? (
+            <SuperAdminDashboard />
+          ) : (
+            <>
+              {/* Main Stats */}
+              <DashboardStats stats={stats} isStatsLoading={dashboardLoading} />
 
-          {/* Enhanced Dashboard Grid */}
-          <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
-            {/* Quick Actions */}
-            <QuickActions />
-            
-            {/* Real-time Notifications */}
-            <FunctionalNotifications />
-            
-            {/* Enhanced Calendar */}
-            <FunctionalCalendarWidget />
-          </div>
+              {/* Enhanced Dashboard Grid */}
+              <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
+                {/* Quick Actions */}
+                <QuickActions />
+                
+                {/* Real-time Notifications */}
+                <FunctionalNotifications />
+                
+                {/* Enhanced Calendar */}
+                <FunctionalCalendarWidget />
+              </div>
 
-          {/* Analytics Widget - Full Width */}
-          <div className="grid gap-6 grid-cols-1">
-            <DataAnalyticsWidget />
-          </div>
+              {/* Analytics Widget - Full Width */}
+              <div className="grid gap-6 grid-cols-1">
+                <DataAnalyticsWidget />
+              </div>
 
-          {/* Role-specific dashboard content */}
-          <RoleBasedContent role={user.role as UserRole} />
+              {/* Role-specific dashboard content */}
+              <RoleBasedContent role={user.role as UserRole} />
+            </>
+          )}
         </main>
       </DashboardLayout>
     </ErrorBoundary>

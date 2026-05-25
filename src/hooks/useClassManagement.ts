@@ -1,17 +1,15 @@
-
 import { useState, useEffect } from "react";
-import { useDatabaseTable } from "@/hooks/use-database-connection";
 import { toast } from "@/hooks/use-toast";
 import { Student } from "@/types/dashboard";
 
+import { ApiClient } from "@/utils/api/client";
+
+const apiClient = new ApiClient();
+
 export const useClassManagement = () => {
-  const { 
-    data: classesData, 
-    isLoading: classesLoading, 
-    error: classesError 
-  } = useDatabaseTable<any>("classes", {
-    refreshInterval: 30000
-  });
+  const [classesData, setClassesData] = useState<any[]>([]);
+  const [classesLoading, setClassesLoading] = useState(true);
+  const [classesError, setClassesError] = useState(null);
 
   const defaultClass = classesData?.[0] || { 
     id: 0, 
@@ -25,24 +23,45 @@ export const useClassManagement = () => {
   const [selectedClass, setSelectedClass] = useState(defaultClass);
   
   useEffect(() => {
-    if (classesData && classesData.length > 0) {
-      setSelectedClass(classesData[0]);
-    }
-  }, [classesData]);
+    const fetchClasses = async () => {
+      try {
+        setClassesLoading(true);
+        const data = await apiClient.get<any[]>('/classes');
+        setClassesData(data);
+        if (data.length > 0) {
+          setSelectedClass(data[0]);
+        }
+      } catch (err: any) {
+        setClassesError(err.message || 'Failed to load classes');
+        toast({ title: "Error", description: "Failed to load classes", variant: "destructive" });
+      } finally {
+        setClassesLoading(false);
+      }
+    };
+    fetchClasses();
+  }, []);
 
-  const { 
-    data: studentsData, 
-    isLoading: studentsLoading, 
-    error: studentsError,
-    update: updateStudent
-  } = useDatabaseTable<Student>("students", {
-    filter: { 
-      grade: selectedClass?.grade || "",
-      section: selectedClass?.section || ""
-    }
-  });
+  const [students, setStudents] = useState<Student[]>([]);
+  const [studentsLoading, setStudentsLoading] = useState(false);
+  const [studentsError, setStudentsError] = useState(null);
 
-  const students = studentsData || [];
+  useEffect(() => {
+    if (selectedClass && selectedClass.id) {
+      const fetchStudents = async () => {
+        try {
+          setStudentsLoading(true);
+          const classData = await apiClient.get<any>(`/classes/${selectedClass.id}`);
+          setStudents(classData.students || []);
+        } catch (err: any) {
+          setStudentsError(err.message || 'Failed to load students');
+          toast({ title: "Error", description: "Failed to load students", variant: "destructive" });
+        } finally {
+          setStudentsLoading(false);
+        }
+      };
+      fetchStudents();
+    }
+  }, [selectedClass]);
   
   const handleAttendance = async (studentId: string, present: boolean) => {
     try {
@@ -50,19 +69,16 @@ export const useClassManagement = () => {
       if (!student) return;
       
       const newAttendance = present ? 
-        Math.min(100, student.attendance + 1) : 
-        Math.max(0, student.attendance - 1);
+        Math.min(100, (student.attendance || 0) + 1) : 
+        Math.max(0, (student.attendance || 0) - 1);
         
-      await updateStudent(studentId, { 
-        attendance: newAttendance,
-      });
+      setStudents(prev => prev.map(s => s.id === studentId ? { ...s, attendance: newAttendance } : s));
       
       toast({
         title: `Attendance Updated`,
         description: `Student marked as ${present ? 'present' : 'absent'}`,
       });
     } catch (error) {
-      
       toast({
         title: "Error",
         description: "Failed to update attendance",

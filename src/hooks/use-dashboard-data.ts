@@ -1,175 +1,91 @@
 import { useState, useEffect } from 'react';
-import { apiClient } from '@/utils/api/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
+import {
+  MOCK_STATS_BY_ROLE,
+  MOCK_NOTIFICATIONS,
+  MOCK_EVENTS,
+  type MockNotification,
+  type MockEvent,
+} from '@/data/mock/dashboard';
+import { DashboardStat } from '@/types/dashboard';
 
-interface BackendDashboardStat {
-  metric: string;
-  value: number;
-  label: string;
-  description: string;
-}
+// Re-export the types expected by consumers
+export type { MockNotification as Notification, MockEvent as Event };
 
-interface BackendNotification {
-  id: string;
-  title: string;
-  message: string;
-  type: 'info' | 'warning' | 'error' | 'success';
-  is_read: boolean;
-  created_at: string;
-}
-
-interface BackendEvent {
-  id: string;
-  title: string;
-  description: string;
-  start_date: string;
-  end_date: string;
-  location: string;
-  event_type: string;
-}
-
-// Frontend types
-interface DashboardStat {
-  title: string;
-  value: string | number;
-  description: string;
-  change?: string | number;
-  increasing?: boolean;
-}
-
-interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  type: 'info' | 'warning' | 'error' | 'success';
-  is_read: boolean;
-  created_at: string;
-}
-
-interface Event {
-  id: string;
-  title: string;
-  description: string;
-  start_date: string;
-  end_date: string;
-  location: string;
-  event_type: string;
-}
+const isDemoToken = () => {
+  const token = localStorage.getItem('authToken');
+  return !token || token.startsWith('demo-token-');
+};
 
 export function useDashboardData() {
   const { user } = useAuth();
   const [stats, setStats] = useState<DashboardStat[]>([]);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [events, setEvents] = useState<Event[]>([]);
+  const [notifications, setNotifications] = useState<MockNotification[]>([]);
+  const [events, setEvents] = useState<MockEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const loadMockData = () => {
+    if (!user) return;
+    const role = user.role;
+    const roleStats = MOCK_STATS_BY_ROLE[role] ?? MOCK_STATS_BY_ROLE['admin'];
+    setStats(roleStats);
+    setNotifications(MOCK_NOTIFICATIONS);
+    setEvents(MOCK_EVENTS);
+    setError(null);
+    setIsLoading(false);
+  };
+
   const fetchDashboardData = async () => {
     if (!user) return;
-
     setIsLoading(true);
-    setError(null);
 
+    // Always use mock data in demo mode (no backend running)
+    if (isDemoToken()) {
+      // Small artificial delay so loading states are visible
+      await new Promise(r => setTimeout(r, 300));
+      loadMockData();
+      return;
+    }
+
+    // Real API path (backend available)
     try {
-      // Fetch dashboard stats
-      const statsResponse = await apiClient.getDashboardStats(user.role, user.id);
-      if (statsResponse.error) {
-        throw new Error(statsResponse.error);
-      }
-      
-      // Transform backend stats to frontend format
-      const transformedStats: DashboardStat[] = ((statsResponse.data as BackendDashboardStat[]) || []).map(stat => ({
-        title: stat.label,
-        value: stat.value,
-        description: stat.description
-      }));
-      setStats(transformedStats);
-
-      // Fetch notifications
-      const notificationsResponse = await apiClient.getNotifications(user.id);
-      if (notificationsResponse.error) {
-        throw new Error(notificationsResponse.error);
-      }
-      // Transform backend notifications to frontend format
-      const transformedNotifications: Notification[] = ((notificationsResponse.data as BackendNotification[]) || []).map((notif: any) => ({
-        id: notif.id,
-        title: notif.title,
-        message: notif.message,
-        type: notif.type || 'info',
-        is_read: notif.is_read || false,
-        created_at: notif.created_at
-      }));
-      setNotifications(transformedNotifications);
-
-      // Fetch events
-      const eventsResponse = await apiClient.getEvents(user.id, user.role);
-      if (eventsResponse.error) {
-        throw new Error(eventsResponse.error);
-      }
-      // Transform backend events to frontend format
-      const transformedEvents: Event[] = ((eventsResponse.data as BackendEvent[]) || []).map((event: any) => ({
-        id: event.id,
-        title: event.title,
-        description: event.description,
-        start_date: event.start_date,
-        end_date: event.end_date,
-        location: event.location,
-        event_type: event.event_type
-      }));
-      setEvents(transformedEvents);
-
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch dashboard data';
-      setError(errorMessage);
-      toast({
-        title: 'Error',
-        description: 'Failed to load dashboard data. Using fallback data.',
-        variant: 'destructive',
-      });
-
-      // Set fallback data
-      setStats([
-        { title: 'Loading...', value: 0, description: 'Data will load shortly' }
+      const { apiClient } = await import('@/utils/api/client');
+      const [statsRes, notifRes, eventsRes] = await Promise.all([
+        apiClient.getDashboardStats(user.role, user.id),
+        apiClient.getNotifications(user.id),
+        apiClient.getEvents(user.id, user.role),
       ]);
-      setNotifications([]);
-      setEvents([]);
+
+      if (statsRes.error || notifRes.error || eventsRes.error) throw new Error('API error');
+
+      const backendStats = (statsRes.data as any[] ?? []).map((s: any) => ({
+        title: s.label ?? s.title,
+        value: s.value,
+        description: s.description,
+      }));
+      setStats(backendStats.length ? backendStats : MOCK_STATS_BY_ROLE[user.role] ?? []);
+      setNotifications((notifRes.data as MockNotification[]) ?? MOCK_NOTIFICATIONS);
+      setEvents((eventsRes.data as MockEvent[]) ?? MOCK_EVENTS);
+    } catch {
+      // Silently fall back to mock data — client demo must not show errors
+      toast({ title: 'Demo Mode', description: 'Using demo data — backend not connected.' });
+      loadMockData();
     } finally {
       setIsLoading(false);
     }
   };
 
-  const markNotificationAsRead = async (notificationId: string) => {
-    if (!user) return;
-    
-    try {
-      const response = await apiClient.markNotificationRead(notificationId, user.id);
-      if (response.error) {
-        throw new Error(response.error);
-      }
-      
-      // Update local state
-      setNotifications(prev => 
-        prev.map(notification => 
-          notification.id === notificationId 
-            ? { ...notification, is_read: true }
-            : notification
-        )
-      );
-    } catch (err) {
-      
-      toast({
-        title: 'Error',
-        description: 'Failed to mark notification as read',
-        variant: 'destructive',
-      });
-    }
+  const markNotificationAsRead = (notificationId: string) => {
+    setNotifications(prev =>
+      prev.map(n => n.id === notificationId ? { ...n, is_read: true } : n)
+    );
+    toast({ title: 'Marked as read', description: 'Notification updated.' });
   };
 
   useEffect(() => {
     fetchDashboardData();
-    
-    // Set up auto-refresh every 5 minutes
     const interval = setInterval(fetchDashboardData, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, [user?.id, user?.role]);
@@ -181,6 +97,6 @@ export function useDashboardData() {
     isLoading,
     error,
     refetch: fetchDashboardData,
-    markNotificationAsRead
+    markNotificationAsRead,
   };
 }

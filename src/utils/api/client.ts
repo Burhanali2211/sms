@@ -11,7 +11,7 @@ export const setDebugFunctions = (addRequest: (request: any) => void) => {
   debugAddRequest = addRequest;
 };
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL = 'http://localhost:3001/api';
 
 interface ApiResponse<T> {
   data?: T;
@@ -77,11 +77,12 @@ class ApiClient {
 
       if (!response.ok) {
         let errorData;
+        const responseClone = response.clone();
         try {
           errorData = await response.json();
         } catch (parseError) {
           // If JSON parsing fails, get text content
-          const text = await response.text();
+          const text = await responseClone.text();
           errorData = { error: text || `HTTP ${response.status}: ${response.statusText}` };
         }
         
@@ -421,8 +422,6 @@ class ApiClient {
 
   // Authentication operations
   async login(email: string, password: string) {
-    // Use Netlify functions for authentication
-    const authUrl = `${this.baseURL}/auth/login`;
     return this.post('/auth/login', { email, password });
   }
 

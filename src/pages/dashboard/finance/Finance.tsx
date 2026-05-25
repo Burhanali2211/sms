@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,7 +14,6 @@ import {
   Briefcase
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { useDatabaseTable } from "@/hooks/use-database-table";
 import {
   Table,
   TableBody,
@@ -51,11 +50,23 @@ interface FinancialRecord {
   status: "paid" | "pending" | "overdue";
 }
 
+const mockRecords: FinancialRecord[] = [
+  { id: "1", description: "Tuition Fee - Grade 10", amount: 1500, type: "fee", date: "2023-05-10", status: "paid" },
+  { id: "2", description: "Library Books", amount: 350, type: "expense", date: "2023-05-12", status: "paid" },
+  { id: "3", description: "Teacher Salary - Math Dept", amount: 4500, type: "salary", date: "2023-05-28", status: "pending" },
+  { id: "4", description: "Bus Fee - Route A", amount: 200, type: "fee", date: "2023-05-15", status: "overdue" },
+];
+
 const Finance = () => {
-  const { data: records, isLoading, insert: addRecord } = useDatabaseTable<FinancialRecord>(
-    "financial_records", 
-    { refreshInterval: 30000 } // Use refreshInterval instead of mockData
-  );
+  const [records, setRecords] = useState<FinancialRecord[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setRecords(mockRecords);
+      setIsLoading(false);
+    }, 500);
+  }, []);
   
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState<string | null>(null);
@@ -105,7 +116,11 @@ const Finance = () => {
     }
 
     try {
-      await addRecord(newRecord);
+      const recordToAdd = {
+        ...newRecord,
+        id: Math.random().toString()
+      } as FinancialRecord;
+      setRecords([...records, recordToAdd]);
       setIsAddDialogOpen(false);
       setNewRecord({
         description: "",
@@ -114,8 +129,11 @@ const Finance = () => {
         date: new Date().toISOString().split('T')[0],
         status: "pending"
       });
+      toast({
+        title: "Record Added",
+        description: "Financial record has been added.",
+      });
     } catch (error) {
-      
       toast({
         variant: "destructive",
         title: "Error",
