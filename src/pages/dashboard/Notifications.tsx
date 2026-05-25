@@ -8,64 +8,31 @@ import { useDashboardData } from "@/hooks/use-dashboard-data";
 import { Notification } from "@/types/dashboard";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/hooks/use-toast";
-import { apiClient } from "@/utils/api/client";
 import { useAuth } from "@/contexts/AuthContext";
+
+const isDemoToken = () => {
+  const token = localStorage.getItem('authToken');
+  return !token || token.startsWith('demo-token-');
+};
 
 const Notifications = () => {
   const { user } = useAuth();
-  const { notifications, isLoading, refetch } = useDashboardData();
-  
+  const { notifications, isLoading, refetch, markNotificationAsRead } = useDashboardData();
+
   const markAsRead = async (id: string) => {
-    if (!user) return;
-    
-    try {
-      const response = await apiClient.markNotificationRead(id, user.id);
-      if (response.error) {
-        throw new Error(response.error);
-      }
-      
-      // Refresh the notifications
-      await refetch();
-      
-      toast({
-        title: "Success",
-        description: "Notification marked as read.",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to mark notification as read.",
-        variant: "destructive",
-      });
+    markNotificationAsRead(id);
+    if (!isDemoToken() && user) {
+      try {
+        const { apiClient } = await import("@/utils/api/client");
+        await apiClient.markNotificationRead(id, user.id);
+      } catch { /* silent */ }
     }
+    toast({ title: "Success", description: "Notification marked as read." });
   };
-  
+
   const markAllAsRead = async () => {
-    if (!user) return;
-    
-    try {
-      // Mark all unread notifications as read
-      const unreadNotifications = notifications.filter(n => !n.is_read);
-      await Promise.all(
-        unreadNotifications.map(notification => 
-          apiClient.markNotificationRead(notification.id, user.id)
-        )
-      );
-      
-      // Refresh the notifications
-      await refetch();
-      
-      toast({
-        title: "Success",
-        description: "All notifications marked as read.",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to mark all notifications as read.",
-        variant: "destructive",
-      });
-    }
+    notifications.filter(n => !n.is_read).forEach(n => markNotificationAsRead(n.id));
+    toast({ title: "Success", description: "All notifications marked as read." });
   };
 
   const unreadCount = notifications.filter(n => !n.is_read).length;

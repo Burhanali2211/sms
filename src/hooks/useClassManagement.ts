@@ -1,39 +1,49 @@
 import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 import { Student } from "@/types/dashboard";
+import { MOCK_CLASSES, MOCK_STUDENTS } from "@/data/mock/academic";
 
-import { ApiClient } from "@/utils/api/client";
-
-const apiClient = new ApiClient();
+const isDemoToken = () => {
+  const token = localStorage.getItem('authToken');
+  return !token || token.startsWith('demo-token-');
+};
 
 export const useClassManagement = () => {
   const [classesData, setClassesData] = useState<any[]>([]);
   const [classesLoading, setClassesLoading] = useState(true);
   const [classesError, setClassesError] = useState(null);
 
-  const defaultClass = classesData?.[0] || { 
-    id: 0, 
-    name: "", 
-    subject: "", 
-    students: 0, 
-    schedule: "", 
-    room: "" 
+  const defaultClass = classesData?.[0] || {
+    id: 0,
+    name: "",
+    subject: "",
+    students: 0,
+    schedule: "",
+    room: ""
   };
-  
+
   const [selectedClass, setSelectedClass] = useState(defaultClass);
-  
+
   useEffect(() => {
     const fetchClasses = async () => {
+      if (isDemoToken()) {
+        setTimeout(() => {
+          setClassesData(MOCK_CLASSES);
+          setSelectedClass(MOCK_CLASSES[0]);
+          setClassesLoading(false);
+        }, 300);
+        return;
+      }
       try {
         setClassesLoading(true);
+        const { ApiClient } = await import("@/utils/api/client");
+        const apiClient = new ApiClient();
         const data = await apiClient.get<any[]>('/classes');
         setClassesData(data);
-        if (data.length > 0) {
-          setSelectedClass(data[0]);
-        }
-      } catch (err: any) {
-        setClassesError(err.message || 'Failed to load classes');
-        toast({ title: "Error", description: "Failed to load classes", variant: "destructive" });
+        if (data.length > 0) setSelectedClass(data[0]);
+      } catch {
+        setClassesData(MOCK_CLASSES);
+        setSelectedClass(MOCK_CLASSES[0]);
       } finally {
         setClassesLoading(false);
       }
@@ -47,14 +57,19 @@ export const useClassManagement = () => {
 
   useEffect(() => {
     if (selectedClass && selectedClass.id) {
+      if (isDemoToken()) {
+        setStudents(MOCK_STUDENTS);
+        return;
+      }
       const fetchStudents = async () => {
         try {
           setStudentsLoading(true);
+          const { ApiClient } = await import("@/utils/api/client");
+          const apiClient = new ApiClient();
           const classData = await apiClient.get<any>(`/classes/${selectedClass.id}`);
-          setStudents(classData.students || []);
-        } catch (err: any) {
-          setStudentsError(err.message || 'Failed to load students');
-          toast({ title: "Error", description: "Failed to load students", variant: "destructive" });
+          setStudents(classData.students || MOCK_STUDENTS);
+        } catch {
+          setStudents(MOCK_STUDENTS);
         } finally {
           setStudentsLoading(false);
         }

@@ -67,44 +67,41 @@ export const useProfile = () => {
   const handleSave = async () => {
     if (!user) return;
 
+    const isDemoToken = () => {
+      const token = localStorage.getItem('authToken');
+      return !token || token.startsWith('demo-token-');
+    };
+
+    if (isDemoToken()) {
+      if (setUser) {
+        setUser({ ...user, name: formData.name, phone: formData.phone, address: formData.address, avatar: formData.avatar });
+      }
+      setIsEditing(false);
+      toast({ title: "Profile Updated", description: "Your profile information has been updated successfully." });
+      return;
+    }
+
     try {
       const response = await apiClient.updateUser(user.id, {
         name: formData.name,
         phone: formData.phone,
         address: formData.address,
-        avatar_url: formData.avatar 
+        avatar_url: formData.avatar
       });
 
       if (response.error) {
-        toast({
-          title: "Update Failed",
-          description: response.error,
-          variant: "destructive"
-        });
+        toast({ title: "Update Failed", description: response.error, variant: "destructive" });
         return;
       }
 
       if (response.data && setUser) {
-        setUser({
-          ...user,
-          name: formData.name,
-          phone: formData.phone,
-          address: formData.address,
-          avatar: formData.avatar
-        });
+        setUser({ ...user, name: formData.name, phone: formData.phone, address: formData.address, avatar: formData.avatar });
       }
 
       setIsEditing(false);
-      toast({
-        title: "Profile Updated",
-        description: "Your profile information has been updated successfully."
-      });
-    } catch (error) {
-      toast({
-        title: "Update Failed",
-        description: "An error occurred while updating your profile.",
-        variant: "destructive"
-      });
+      toast({ title: "Profile Updated", description: "Your profile information has been updated successfully." });
+    } catch {
+      toast({ title: "Update Failed", description: "An error occurred while updating your profile.", variant: "destructive" });
     }
   };
 

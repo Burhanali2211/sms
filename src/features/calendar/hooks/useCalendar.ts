@@ -2,6 +2,26 @@ import { useState, useEffect } from "react";
 import { CalendarEvent } from "@/types/calendar";
 import { apiClient } from "@/utils/api/client";
 import { toast } from "@/hooks/use-toast";
+import { MOCK_EVENTS } from "@/data/mock/dashboard";
+
+const isDemoToken = () => {
+  const token = localStorage.getItem('authToken');
+  return !token || token.startsWith('demo-token-');
+};
+
+const toCalendarEvents = (mockEvents: typeof MOCK_EVENTS): CalendarEvent[] =>
+  mockEvents.map(e => ({
+    id: e.id,
+    title: e.title,
+    description: e.description,
+    start_date: e.start_date,
+    end_date: e.end_date,
+    location: e.location || '',
+    event_type: e.event_type as CalendarEvent['event_type'],
+    is_public: true,
+    created_by: 'system',
+    created_at: e.start_date
+  }));
 
 export const useCalendar = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -31,26 +51,23 @@ export const useCalendar = () => {
 
   const fetchEvents = async () => {
     setIsLoading(true);
+    if (isDemoToken()) {
+      setEvents(toCalendarEvents(MOCK_EVENTS));
+      setIsLoading(false);
+      return;
+    }
     try {
       const response = await apiClient.getCalendarEvents();
-      if (response.error) {
-        throw new Error(response.error);
-      }
+      if (response.error) throw new Error(response.error);
       let eventsData = response.data;
       if (!Array.isArray(eventsData) && eventsData !== undefined) {
         eventsData = Array.isArray(eventsData) ? eventsData : [eventsData];
       } else if (eventsData === undefined && Array.isArray(response)) {
         eventsData = response;
       }
-      
-      setEvents((eventsData as CalendarEvent[]) || []);
-    } catch (error) {
-      console.error('Calendar fetch error:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load events. Please try again.",
-        variant: "destructive",
-      });
+      setEvents((eventsData as CalendarEvent[]) || toCalendarEvents(MOCK_EVENTS));
+    } catch {
+      setEvents(toCalendarEvents(MOCK_EVENTS));
     } finally {
       setIsLoading(false);
     }

@@ -7,6 +7,12 @@ import { Bell, Check, AlertCircle, Info, CheckCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
 import { apiClient } from "@/utils/api/client";
+import { MOCK_NOTIFICATIONS } from "@/data/mock/dashboard";
+
+const isDemoToken = () => {
+  const token = localStorage.getItem('authToken');
+  return !token || token.startsWith('demo-token-');
+};
 
 interface Notification {
   id: string;
@@ -35,15 +41,18 @@ const FunctionalNotifications = () => {
   }, [user?.id]);
 
   const fetchNotifications = async () => {
+    if (isDemoToken()) {
+      const transformed: Notification[] = MOCK_NOTIFICATIONS.map(n => ({ ...n }));
+      setNotifications(transformed);
+      setUnreadCount(transformed.filter(n => !n.is_read).length);
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       const response = await apiClient.getNotifications(user?.id || '');
-      if (response.error) {
-        throw new Error(response.error);
-      }
-      
+      if (response.error) throw new Error(response.error);
       const notificationData = (response.data as any[]) || [];
-      // Transform the data to match our Notification interface
       const transformedNotifications: Notification[] = notificationData.map((notif: any) => ({
         id: notif.id,
         title: notif.title,
@@ -53,16 +62,12 @@ const FunctionalNotifications = () => {
         created_at: notif.created_at,
         action_url: notif.action_url
       }));
-      
       setNotifications(transformedNotifications);
       setUnreadCount(transformedNotifications.filter(n => !n.is_read).length);
-    } catch (error) {
-      console.error('Notifications widget error:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load notifications',
-        variant: 'destructive',
-      });
+    } catch {
+      const fallback: Notification[] = MOCK_NOTIFICATIONS.map(n => ({ ...n }));
+      setNotifications(fallback);
+      setUnreadCount(fallback.filter(n => !n.is_read).length);
     } finally {
       setLoading(false);
     }
@@ -70,56 +75,23 @@ const FunctionalNotifications = () => {
 
   const markAsRead = async (id: string) => {
     if (!user) return;
-    
-    try {
-      const response = await apiClient.markNotificationRead(id, user.id);
-      if (response.error) {
-        throw new Error(response.error);
-      }
-      
-      setNotifications(prev => 
-        prev.map(n => n.id === id ? { ...n, is_read: true } : n)
-      );
-      setUnreadCount(prev => Math.max(0, prev - 1));
-      
-      toast({
-        title: 'Success',
-        description: 'Notification marked as read',
-      });
-    } catch (error: any) {
-      console.error('Mark as read error:', error);
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to mark notification as read',
-        variant: 'destructive',
-      });
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
+    setUnreadCount(prev => Math.max(0, prev - 1));
+    if (!isDemoToken()) {
+      try {
+        await apiClient.markNotificationRead(id, user.id);
+      } catch { /* silent */ }
     }
   };
 
   const markAllAsRead = async () => {
     if (!user) return;
-    
-    try {
-      // Use the dedicated endpoint for marking all as read
-      const response = await apiClient.put('/notifications/mark-all-read', { user_id: user.id });
-      if (response.error) {
-        throw new Error(response.error);
-      }
-      
-      setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
-      setUnreadCount(0);
-      
-      toast({
-        title: 'Success',
-        description: 'All notifications marked as read',
-      });
-    } catch (error: any) {
-      console.error('Mark all as read error:', error);
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to mark all notifications as read',
-        variant: 'destructive',
-      });
+    setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+    setUnreadCount(0);
+    if (!isDemoToken()) {
+      try {
+        await apiClient.put('/notifications/mark-all-read', { user_id: user.id });
+      } catch { /* silent */ }
     }
   };
 

@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { ClubActivity } from "@/types/dashboard";
 import { toast } from "@/hooks/use-toast";
+import { MOCK_CLUBS } from "@/data/mock/clubs";
 import {
   Select,
   SelectContent,
@@ -55,84 +56,8 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 
-// Mock data for clubs and activities - explicitly typed to match ClubActivity
-const mockActivities: ClubActivity[] = [
-  {
-    id: "1",
-    name: "Chess Club",
-    description: "Learn and practice chess strategies with peers and teachers.",
-    schedule: "Monday, 3:30 PM - 5:00 PM",
-    location: "Room 105",
-    members: 18,
-    status: "active"
-  },
-  {
-    id: "2",
-    name: "Debate Team",
-    description: "Develop public speaking and debate skills through competitions and practice.",
-    schedule: "Tuesday and Thursday, 4:00 PM - 6:00 PM",
-    location: "Auditorium",
-    members: 24,
-    status: "active"
-  },
-  {
-    id: "3",
-    name: "Science Olympiad",
-    description: "Prepare for science competitions and explore advanced topics.",
-    schedule: "Wednesday, 3:30 PM - 5:30 PM",
-    location: "Science Lab 1",
-    members: 15,
-    status: "active"
-  },
-  {
-    id: "4",
-    name: "Photography Club",
-    description: "Learn photography techniques and go on photo walks around campus.",
-    schedule: "Friday, 3:30 PM - 5:00 PM",
-    location: "Art Room",
-    members: 12,
-    status: "active"
-  },
-  {
-    id: "5",
-    name: "Drama Club",
-    description: "Practice acting and participate in school performances.",
-    schedule: "Monday and Wednesday, 4:00 PM - 6:00 PM",
-    location: "Theater",
-    members: 30,
-    status: "active"
-  },
-  {
-    id: "6",
-    name: "Basketball Team",
-    description: "School basketball team for competitive games.",
-    schedule: "Tuesday and Thursday, 3:30 PM - 5:30 PM",
-    location: "Gym",
-    members: 15,
-    status: "active"
-  },
-  {
-    id: "7",
-    name: "Coding Club",
-    description: "Learn programming and work on coding projects.",
-    schedule: "Thursday, 3:30 PM - 5:00 PM",
-    location: "Computer Lab",
-    members: 20,
-    status: "active"
-  },
-  {
-    id: "8",
-    name: "Environmental Club",
-    description: "Work on sustainability initiatives around the school.",
-    schedule: "Every other Friday, 3:30 PM - 4:30 PM",
-    location: "Room 202",
-    members: 14,
-    status: "inactive"
-  }
-];
-
 const ClubActivities = () => {
-  const [activities, setActivities] = useState<ClubActivity[]>(mockActivities);
+  const [activities, setActivities] = useState<ClubActivity[]>(MOCK_CLUBS);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [isAddingActivity, setIsAddingActivity] = useState(false);
