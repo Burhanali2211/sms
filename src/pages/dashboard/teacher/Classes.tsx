@@ -25,7 +25,7 @@ const Classes = () => {
     return (
       <DashboardLayout>
         <DashboardHeader title="My Classes" />
-        <div className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900 p-6">
+        <div className="flex-1 overflow-auto bg-background p-6">
           <div className="flex items-center justify-center h-64">
             <p className="text-muted-foreground">Loading classes...</p>
           </div>
@@ -38,7 +38,7 @@ const Classes = () => {
     return (
       <DashboardLayout>
         <DashboardHeader title="My Classes" />
-        <div className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900 p-6">
+        <div className="flex-1 overflow-auto bg-background p-6">
           <div className="flex items-center justify-center h-64">
             <p className="text-red-500">Error loading classes. Please try again later.</p>
           </div>
@@ -50,7 +50,7 @@ const Classes = () => {
   return (
     <DashboardLayout>
       <DashboardHeader title="My Classes" />
-      <div className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900 p-6">
+      <div className="flex-1 overflow-auto bg-background p-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
           {classesData && classesData.length > 0 ? (
             classesData.map((cls: any) => (

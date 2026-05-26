@@ -40,7 +40,7 @@ const Notifications = () => {
   return (
     <DashboardLayout>
       <DashboardHeader title="Notifications" />
-      <div className="flex-1 overflow-auto bg-gray-50 p-6">
+      <div className="flex-1 overflow-auto bg-background p-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <div className="flex items-center">
@@ -63,12 +63,12 @@ const Notifications = () => {
             <div className="space-y-4">
               {isLoading ? (
                 <div className="text-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-foreground mx-auto"></div>
                   <p className="mt-2">Loading notifications...</p>
                 </div>
               ) : notifications.length === 0 ? (
                 <div className="text-center py-8">
-                  <Bell className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <Bell className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                   <h3 className="font-medium text-lg">No notifications</h3>
                   <p className="text-muted-foreground">You're all caught up!</p>
                 </div>
@@ -77,7 +77,7 @@ const Notifications = () => {
                   <div 
                     key={notification.id} 
                     className={`p-4 border rounded-md transition-colors ${
-                      notification.is_read ? 'bg-white' : 'bg-blue-50'
+                      notification.is_read ? 'bg-card' : 'bg-blue-500/10'
                     }`}
                   >
                     <div className="flex items-start">
@@ -97,7 +97,7 @@ const Notifications = () => {
                         </div>
                         <p className="text-sm mt-1">{notification.message}</p>
                         <div className="flex items-center gap-2 mt-2">
-                          <span className="text-xs px-2 py-1 bg-gray-100 rounded-full">
+                          <span className="text-xs px-2 py-1 bg-muted rounded-full">
                             {notification.type}
                           </span>
                           {!notification.is_read && (

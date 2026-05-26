@@ -19,7 +19,7 @@ const Staff = () => {
   return (
     <DashboardLayout>
       <DashboardHeader title="Staff Management" />
-      <div className="flex-1 overflow-auto bg-gray-50 p-6">
+      <div className="flex-1 overflow-auto bg-background p-6">
         <StaffFilters 
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}

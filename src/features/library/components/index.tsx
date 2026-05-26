@@ -54,7 +54,7 @@ const Library = () => {
   return (
     <DashboardLayout>
       <DashboardHeader title="Library Management" description="Manage books and borrowing" />
-      <div className="flex-1 overflow-auto bg-gray-50 p-6">
+      <div className="flex-1 overflow-auto bg-background p-6">
         {isLoading ? (
           <div className="flex items-center justify-center h-64">
             <p className="text-muted-foreground">Loading library data...</p>

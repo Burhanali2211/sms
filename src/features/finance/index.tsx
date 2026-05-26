@@ -20,7 +20,7 @@ const Finance = () => {
   return (
     <DashboardLayout>
       <DashboardHeader title="Finance Management" description="Track income, expenses, and financial reports" />
-      <div className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900 p-6">
+      <div className="flex-1 overflow-auto bg-background p-6">
         <FinanceStats 
           totalIncome={totalIncome}
           totalExpenses={totalExpenses}

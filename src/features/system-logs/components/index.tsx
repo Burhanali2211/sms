@@ -44,7 +44,7 @@ const SystemLogs = () => {
         title="System Logs"
         description="View and manage system logs and activities"
       />
-      <div className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900 p-6">
+      <div className="flex-1 overflow-auto bg-background p-6">
         <LogStats 
           errorCount={errorCount}
           warningCount={warningCount}

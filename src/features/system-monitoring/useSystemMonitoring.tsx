@@ -32,32 +32,36 @@ export interface UsageData {
 }
 
 export const mockSystemStatus: SystemStatus = {
-  status: 'healthy',
-  uptime: '25 days, 14 hours, 12 minutes',
+  status: 'warning',
+  uptime: '42 days, 6 hours, 18 minutes',
   lastChecked: '2 minutes ago',
-  cpuUsage: 32,
-  memoryUsage: 45,
-  networkUsage: 28,
-  diskUsage: 65,
+  cpuUsage: 42,
+  memoryUsage: 68,
+  networkUsage: 34,
+  diskUsage: 78,
   services: [
-    { name: 'Database', status: 'online', responseTime: 12 },
-    { name: 'Authentication', status: 'online', responseTime: 8 },
-    { name: 'Storage', status: 'online', responseTime: 15 },
-    { name: 'Email', status: 'degraded', responseTime: 450, lastIncident: '2 hours ago' },
-    { name: 'API Gateway', status: 'online', responseTime: 22 },
-    { name: 'Backup Service', status: 'online', responseTime: 30 },
-    { name: 'Search', status: 'online', responseTime: 25 },
-    { name: 'Notification', status: 'online', responseTime: 18 },
+    { name: 'Database Main', status: 'online', responseTime: 14 },
+    { name: 'Database Replica', status: 'online', responseTime: 18 },
+    { name: 'Authentication', status: 'online', responseTime: 9 },
+    { name: 'File Storage', status: 'online', responseTime: 21 },
+    { name: 'Email / SMTP', status: 'degraded', responseTime: 520, lastIncident: '3 hours ago' },
+    { name: 'API Gateway', status: 'online', responseTime: 24 },
+    { name: 'Cache Layer', status: 'degraded', responseTime: 85, lastIncident: '45 minutes ago' },
+    { name: 'Backup Service', status: 'online', responseTime: 32 },
+    { name: 'Notification Service', status: 'online', responseTime: 19 },
+    { name: 'Search Service', status: 'online', responseTime: 28 },
+    { name: 'CDN Edge', status: 'online', responseTime: 11 },
+    { name: 'Load Balancer', status: 'online', responseTime: 6 },
   ]
 };
 
 export const performanceMetrics: PerformanceMetric[] = [
-  { name: 'Database Queries', value: 2345, limit: 5000 },
-  { name: 'API Calls', value: 12500, limit: 20000 },
-  { name: 'Active Users', value: 185, limit: 500 },
-  { name: 'File Storage', value: 45, limit: 100 },
-  { name: 'Cache Hit Rate', value: 92 },
-  { name: 'Average Response Time', value: 120 }
+  { name: 'Database Queries', value: 3842, limit: 6000 },
+  { name: 'API Calls', value: 15600, limit: 25000 },
+  { name: 'Active Users', value: 312, limit: 1500 },
+  { name: 'File Storage (GB)', value: 78, limit: 100 },
+  { name: 'Cache Hit Rate', value: 71 },
+  { name: 'Avg Response Time (ms)', value: 148 }
 ];
 
 // Usage history mock data (last 24 hours)

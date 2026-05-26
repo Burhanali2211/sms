@@ -23,7 +23,7 @@ const Profile = () => {
   return (
     <DashboardLayout>
       <DashboardHeader title="Profile" />
-      <div className="flex-1 overflow-auto bg-gray-50 p-6">
+      <div className="flex-1 overflow-auto bg-background p-6">
         <div className="max-w-4xl mx-auto space-y-6">
           <ProfileHeader 
             isEditing={isEditing} 

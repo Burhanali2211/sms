@@ -27,7 +27,7 @@ const LabResources = () => {
     return (
       <DashboardLayout>
         <DashboardHeader title="Lab Resources" />
-        <div className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900 p-6">
+        <div className="flex-1 overflow-auto bg-background p-6">
           <div className="flex items-center justify-center h-64">
             <p className="text-muted-foreground">Loading resources...</p>
           </div>
@@ -39,7 +39,7 @@ const LabResources = () => {
   return (
     <DashboardLayout>
       <DashboardHeader title="Lab Resources" />
-      <div className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900 p-6">
+      <div className="flex-1 overflow-auto bg-background p-6">
         <LabResourcesHeader 
           totalResources={totalResources}
           totalItems={totalItems}

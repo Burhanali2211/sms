@@ -51,7 +51,7 @@ export const EventList = ({
               .map(event => (
                 <div 
                   key={event.id} 
-                  className="p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                  className="p-3 border rounded-lg cursor-pointer hover:bg-accent transition-colors"
                   onClick={() => handleViewEvent(event)}
                 >
                   <div className="flex justify-between items-start">

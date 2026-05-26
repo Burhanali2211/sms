@@ -22,7 +22,7 @@ const SystemSettings = () => {
   return (
     <DashboardLayout>
       <DashboardHeader title="System Settings" description="Configure system-wide settings and preferences" />
-      <div className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900 p-6">
+      <div className="flex-1 overflow-auto bg-background p-6">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">

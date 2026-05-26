@@ -220,7 +220,7 @@ export const SummaryTab = () => {
           <CardTitle className="text-md">Financial Overview</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">$2.5M</div>
+          <div className="text-2xl font-bold">₹2.8 Cr</div>
           <div className="text-xs text-muted-foreground">Annual budget</div>
 
           <div className="mt-4 space-y-2">

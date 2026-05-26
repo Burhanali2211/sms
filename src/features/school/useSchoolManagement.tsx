@@ -3,47 +3,57 @@ import { toast } from "@/hooks/use-toast";
 
 // Mock class data
 export const mockClassrooms = [
-  { id: "1", name: "Room 101", capacity: 30, building: "Main Building", floor: 1, features: ["Projector", "Whiteboard"] },
-  { id: "2", name: "Room 102", capacity: 25, building: "Main Building", floor: 1, features: ["Whiteboard"] },
-  { id: "3", name: "Room 201", capacity: 35, building: "Main Building", floor: 2, features: ["Projector", "Whiteboard", "Computers"] },
-  { id: "4", name: "Room 202", capacity: 40, building: "Main Building", floor: 2, features: ["Projector", "Whiteboard", "Smart Board"] },
-  { id: "5", name: "Science Lab 1", capacity: 20, building: "Science Wing", floor: 1, features: ["Lab Equipment", "Whiteboard", "Sink"] },
-  { id: "6", name: "Computer Lab", capacity: 30, building: "Technology Wing", floor: 1, features: ["Computers", "Projector", "Printer"] },
-  { id: "7", name: "Library", capacity: 50, building: "Main Building", floor: 1, features: ["Bookshelves", "Study Desks", "Computers"] },
-  { id: "8", name: "Auditorium", capacity: 200, building: "Arts Wing", floor: 1, features: ["Stage", "Sound System", "Seating"] },
+  { id: "1",  name: "Room 101",          capacity: 40, building: "Main Block",       floor: 1, features: ["Projector", "Whiteboard", "Fan"] },
+  { id: "2",  name: "Room 102",          capacity: 40, building: "Main Block",       floor: 1, features: ["Whiteboard", "Fan"] },
+  { id: "3",  name: "Room 103",          capacity: 35, building: "Main Block",       floor: 1, features: ["Projector", "Whiteboard", "Fan"] },
+  { id: "4",  name: "Room 201",          capacity: 40, building: "Main Block",       floor: 2, features: ["Projector", "Whiteboard", "Smart Board", "AC"] },
+  { id: "5",  name: "Room 202",          capacity: 40, building: "Main Block",       floor: 2, features: ["Projector", "Whiteboard", "AC"] },
+  { id: "6",  name: "Room 203",          capacity: 35, building: "Main Block",       floor: 2, features: ["Whiteboard", "AC"] },
+  { id: "7",  name: "Room 301",          capacity: 40, building: "Main Block",       floor: 3, features: ["Projector", "Whiteboard", "AC"] },
+  { id: "8",  name: "Room 302",          capacity: 40, building: "Main Block",       floor: 3, features: ["Projector", "Whiteboard", "Smart Board", "AC"] },
+  { id: "9",  name: "Physics Lab",       capacity: 24, building: "Science Wing",     floor: 1, features: ["Lab Equipment", "Whiteboard", "Exhaust Fan", "First Aid"] },
+  { id: "10", name: "Chemistry Lab",     capacity: 24, building: "Science Wing",     floor: 1, features: ["Lab Equipment", "Whiteboard", "Fume Hood", "Sink", "First Aid"] },
+  { id: "11", name: "Biology Lab",       capacity: 24, building: "Science Wing",     floor: 2, features: ["Lab Equipment", "Whiteboard", "Microscopes", "Sink"] },
+  { id: "12", name: "Computer Lab",      capacity: 32, building: "Technology Wing",  floor: 1, features: ["32 PCs", "Projector", "Printer", "AC", "Internet"] },
+  { id: "13", name: "Library",           capacity: 60, building: "Main Block",       floor: 1, features: ["4200 Books", "Study Desks", "Computers", "AC", "RFID System"] },
+  { id: "14", name: "Art & Craft Room",  capacity: 30, building: "Arts Wing",        floor: 1, features: ["Drawing Boards", "Storage Cabinets", "Display Wall"] },
+  { id: "15", name: "Music Room",        capacity: 20, building: "Arts Wing",        floor: 1, features: ["Piano", "Instruments", "Soundproofing"] },
+  { id: "16", name: "Auditorium",        capacity: 400, building: "Arts Wing",       floor: 1, features: ["Stage", "PA System", "Projector Screen", "AC", "Green Room"] },
+  { id: "17", name: "Staff Room",        capacity: 40, building: "Main Block",       floor: 1, features: ["Workstations", "Printer", "AC", "Pantry"] },
+  { id: "18", name: "Sports Hall",       capacity: 100, building: "Sports Complex",  floor: 1, features: ["Badminton Court", "TT Tables", "Changing Rooms"] },
 ];
 
 // Mock academic year data
 export const mockAcademicYears = [
-  { id: "1", name: "2023-2024", start: "2023-08-15", end: "2024-05-30", current: true },
-  { id: "2", name: "2022-2023", start: "2022-08-16", end: "2023-05-31", current: false },
-  { id: "3", name: "2021-2022", start: "2021-08-15", end: "2022-05-30", current: false },
+  { id: "1", name: "2025-2026", start: "2025-04-01", end: "2026-03-31", current: true },
+  { id: "2", name: "2024-2025", start: "2024-04-01", end: "2025-03-31", current: false },
+  { id: "3", name: "2023-2024", start: "2023-04-01", end: "2024-03-31", current: false },
 ];
 
 // Mock terms data
 export const mockTerms = [
-  { id: "1", name: "Fall 2023", start: "2023-08-15", end: "2023-12-20", academicYear: "2023-2024", current: true },
-  { id: "2", name: "Spring 2024", start: "2024-01-08", end: "2024-05-30", academicYear: "2023-2024", current: false },
-  { id: "3", name: "Fall 2022", start: "2022-08-16", end: "2022-12-21", academicYear: "2022-2023", current: false },
-  { id: "4", name: "Spring 2023", start: "2023-01-09", end: "2023-05-31", academicYear: "2022-2023", current: false },
+  { id: "1", name: "Term I (2025-26)",   start: "2025-04-01", end: "2025-09-30", academicYear: "2025-2026", current: false },
+  { id: "2", name: "Term II (2025-26)",  start: "2025-10-01", end: "2026-03-31", academicYear: "2025-2026", current: true },
+  { id: "3", name: "Term I (2024-25)",   start: "2024-04-01", end: "2024-09-30", academicYear: "2024-2025", current: false },
+  { id: "4", name: "Term II (2024-25)",  start: "2024-10-01", end: "2025-03-31", academicYear: "2024-2025", current: false },
 ];
 
 export const useSchoolManagement = () => {
   const [activeTab, setActiveTab] = useState("info");
   
   const [schoolInfo, setSchoolInfo] = useState({
-    name: "EduSync Academy",
-    address: "123 Education Street",
-    city: "Learning City",
-    state: "Knowledge State",
-    zipCode: "12345",
-    country: "United States",
-    phone: "(555) 123-4567",
-    email: "info@edusync.academy",
-    website: "https://edusync.academy",
-    principal: "Pat Principal",
-    founded: "2010",
-    slogan: "Empowering Minds, Shaping Futures"
+    name: "EIT Senior Secondary School",
+    address: "Plot No. 14, Sector 12, Near Civil Lines",
+    city: "Lucknow",
+    state: "Uttar Pradesh",
+    zipCode: "226001",
+    country: "India",
+    phone: "0522-2614-890",
+    email: "info@eitsms.edu.in",
+    website: "https://eitsms.edu.in",
+    principal: "Dr. S. K. Arora",
+    founded: "2005",
+    slogan: "ज्ञान, शील, एकता — Knowledge, Character, Unity"
   });
   
   const [classrooms, setClassrooms] = useState(mockClassrooms);

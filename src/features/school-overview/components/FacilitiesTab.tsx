@@ -94,16 +94,20 @@ export const FacilitiesTab = () => {
         <CardContent>
           <div className="space-y-4">
             <div className="p-3 border rounded-md">
-              <h3 className="font-medium">Science Lab Renovation</h3>
-              <p className="text-sm text-muted-foreground">Scheduled for next semester</p>
+              <h3 className="font-medium">Chemistry Lab Renovation</h3>
+              <p className="text-sm text-muted-foreground">Budget approved — work begins Oct 2026</p>
             </div>
             <div className="p-3 border rounded-md">
-              <h3 className="font-medium">New Computer Lab</h3>
-              <p className="text-sm text-muted-foreground">Planned for next academic year</p>
+              <h3 className="font-medium">Smart Board Rollout (8 Classrooms)</h3>
+              <p className="text-sm text-muted-foreground">Phase 2 installation — July 2026</p>
             </div>
             <div className="p-3 border rounded-md">
-              <h3 className="font-medium">Sports Field Expansion</h3>
-              <p className="text-sm text-muted-foreground">In planning phase</p>
+              <h3 className="font-medium">Rooftop Solar Installation</h3>
+              <p className="text-sm text-muted-foreground">Tender floated — target completion Dec 2026</p>
+            </div>
+            <div className="p-3 border rounded-md">
+              <h3 className="font-medium">CCTV Upgrade (IP Cameras)</h3>
+              <p className="text-sm text-muted-foreground">48 cameras across campus — June 2026</p>
             </div>
           </div>
         </CardContent>

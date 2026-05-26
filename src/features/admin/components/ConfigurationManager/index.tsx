@@ -43,7 +43,7 @@ const ConfigurationManager = () => {
       <div className="container py-6 max-w-6xl">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Configuration Manager</h1>
+            <h1 className="text-xl font-semibold text-foreground">Configuration Manager</h1>
             <p className="text-muted-foreground">Manage and configure system-wide settings.</p>
           </div>
           <div className="flex items-center gap-2">

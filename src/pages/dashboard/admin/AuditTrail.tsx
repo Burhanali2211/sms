@@ -1,520 +1,127 @@
+import React, { useState } from 'react';
+import DashboardLayout from '@/components/dashboard/DashboardLayout';
+import DashboardHeader from '@/components/dashboard/DashboardHeader';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Search, History, Download } from 'lucide-react';
 
-import React, { useState } from "react";
-import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { StatusBadge } from "@/components/ui/status-badge";
-import { Button } from "@/components/ui/button";
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
-import { Search, History, User, Undo, AlertCircle, Calendar, DownloadCloud, Trash, PenLine, Plus, FilePlus, FileX, UserPlus, UserMinus } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { toast } from "@/hooks/use-toast";
-
-// Types for audit events
-interface AuditEvent {
-  id: string;
-  timestamp: string;
-  user: {
-    id: string;
-    name: string;
-    avatar?: string;
-  };
-  action: 'create' | 'update' | 'delete' | 'restore' | 'login' | 'logout' | 'add-user' | 'remove-user';
-  entityType: string;
-  entityId: string;
-  entityName: string;
-  details?: string;
-  canRevert: boolean;
-}
-
-// Mock audit events
-const mockAuditEvents: AuditEvent[] = [
-  {
-    id: '1',
-    timestamp: '2025-05-18T11:23:45Z',
-    user: {
-      id: '101',
-      name: 'John Admin',
-      avatar: '/placeholder.svg'
-    },
-    action: 'update',
-    entityType: 'settings',
-    entityId: 'sys-001',
-    entityName: 'System Settings',
-    details: 'Updated email notification settings',
-    canRevert: true
-  },
-  {
-    id: '2',
-    timestamp: '2025-05-18T10:42:20Z',
-    user: {
-      id: '102',
-      name: 'Sarah Manager',
-      avatar: '/placeholder.svg'
-    },
-    action: 'create',
-    entityType: 'class',
-    entityId: 'cls-432',
-    entityName: 'Advanced Mathematics',
-    details: 'Created new class with 25 students',
-    canRevert: false
-  },
-  {
-    id: '3',
-    timestamp: '2025-05-18T09:30:10Z',
-    user: {
-      id: '103',
-      name: 'Mike Librarian',
-      avatar: '/placeholder.svg'
-    },
-    action: 'delete',
-    entityType: 'book',
-    entityId: 'book-221',
-    entityName: 'Pride and Prejudice',
-    details: 'Removed from library catalog - damaged copy',
-    canRevert: true
-  },
-  {
-    id: '4',
-    timestamp: '2025-05-18T08:15:33Z',
-    user: {
-      id: '101',
-      name: 'John Admin',
-      avatar: '/placeholder.svg'
-    },
-    action: 'add-user',
-    entityType: 'user',
-    entityId: 'usr-556',
-    entityName: 'Emily Teacher',
-    details: 'Added with role: Teacher',
-    canRevert: false
-  },
-  {
-    id: '5',
-    timestamp: '2025-05-17T17:22:19Z',
-    user: {
-      id: '104',
-      name: 'Alex Principal',
-      avatar: '/placeholder.svg'
-    },
-    action: 'update',
-    entityType: 'schedule',
-    entityId: 'sch-987',
-    entityName: 'Fall Semester Schedule',
-    details: 'Updated exam dates for all classes',
-    canRevert: true
-  },
-  {
-    id: '6',
-    timestamp: '2025-05-17T16:05:45Z',
-    user: {
-      id: '102',
-      name: 'Sarah Manager',
-      avatar: '/placeholder.svg'
-    },
-    action: 'login',
-    entityType: 'system',
-    entityId: 'sys-auth',
-    entityName: 'System Login',
-    details: 'Login from IP: 192.168.1.25',
-    canRevert: false
-  },
-  {
-    id: '7',
-    timestamp: '2025-05-17T14:33:22Z',
-    user: {
-      id: '103',
-      name: 'Mike Librarian',
-      avatar: '/placeholder.svg'
-    },
-    action: 'restore',
-    entityType: 'book',
-    entityId: 'book-118',
-    entityName: 'To Kill a Mockingbird',
-    details: 'Restored to library catalog',
-    canRevert: false
-  },
-  {
-    id: '8',
-    timestamp: '2025-05-17T12:11:05Z',
-    user: {
-      id: '101',
-      name: 'John Admin',
-      avatar: '/placeholder.svg'
-    },
-    action: 'remove-user',
-    entityType: 'user',
-    entityId: 'usr-332',
-    entityName: 'Robert Smith',
-    details: 'Removed role: Student (graduated)',
-    canRevert: true
-  },
-  {
-    id: '9',
-    timestamp: '2025-05-17T10:55:30Z',
-    user: {
-      id: '104',
-      name: 'Alex Principal',
-      avatar: '/placeholder.svg'
-    },
-    action: 'create',
-    entityType: 'policy',
-    entityId: 'pol-45',
-    entityName: 'Attendance Policy',
-    details: 'Created new attendance policy for 2025-2026',
-    canRevert: false
-  },
-  {
-    id: '10',
-    timestamp: '2025-05-17T09:40:12Z',
-    user: {
-      id: '102',
-      name: 'Sarah Manager',
-      avatar: '/placeholder.svg'
-    },
-    action: 'logout',
-    entityType: 'system',
-    entityId: 'sys-auth',
-    entityName: 'System Logout',
-    details: 'Session timeout',
-    canRevert: false
-  },
+const logs = [
+  { id: '1',  time: '25 May 2026, 11:23', user: 'Rohan Verma',      action: 'update',      entity: 'System Settings',          detail: 'Updated SMTP gateway and notification templates',        type: 'info'    },
+  { id: '2',  time: '25 May 2026, 10:42', user: 'Priya Sharma',     action: 'create',      entity: 'Class: Adv. Maths X-A',    detail: 'Created new section with 38 students enrolled',          type: 'success' },
+  { id: '3',  time: '25 May 2026, 09:30', user: 'Mohammed Khan',    action: 'delete',      entity: 'Book: Physics Vol. II',     detail: 'Removed from catalog — physically damaged',              type: 'error'   },
+  { id: '4',  time: '25 May 2026, 08:15', user: 'Rohan Verma',      action: 'add-user',    entity: 'User: Sunita Mishra',       detail: 'Added with role: Teacher — Chemistry',                   type: 'success' },
+  { id: '5',  time: '25 May 2026, 07:50', user: 'Principal Arora',  action: 'update',      entity: 'Exam Timetable',            detail: 'Rescheduled board exam dates for Class X & XII',         type: 'warning' },
+  { id: '6',  time: '24 May 2026, 17:05', user: 'Priya Sharma',     action: 'login',       entity: 'System Auth',               detail: 'Login from IP 192.168.10.25 (Office LAN)',               type: 'info'    },
+  { id: '7',  time: '24 May 2026, 16:33', user: 'Mohammed Khan',    action: 'restore',     entity: 'Book: Maths NCERT XII',     detail: 'Restored to catalog after re-acquisition',               type: 'success' },
+  { id: '8',  time: '24 May 2026, 15:11', user: 'Rohan Verma',      action: 'remove-user', entity: 'User: Karan Mehta',         detail: 'Account deactivated — student transferred',              type: 'warning' },
+  { id: '9',  time: '24 May 2026, 14:55', user: 'Principal Arora',  action: 'create',      entity: 'Policy: Attendance 2026',   detail: 'Min 75% attendance required for exams',                  type: 'success' },
+  { id: '10', time: '24 May 2026, 13:40', user: 'Anjali Gupta',     action: 'update',      entity: 'Admission Form 2026-27',    detail: 'Updated eligibility criteria and document checklist',    type: 'info'    },
+  { id: '11', time: '24 May 2026, 12:20', user: 'Fatima Siddiqui',  action: 'create',      entity: 'Fee Structure 2026-27',     detail: 'Published annual fee structure',                         type: 'success' },
+  { id: '12', time: '24 May 2026, 11:05', user: 'Vikram Patel',     action: 'update',      entity: 'Timetable: Semester II',    detail: 'Modified 3 class periods — Physics Lab swap',            type: 'info'    },
+  { id: '13', time: '24 May 2026, 09:30', user: 'system_auto',      action: 'backup',      entity: 'Database Main',             detail: 'Scheduled backup completed — 320 GB archived',           type: 'success' },
+  { id: '14', time: '23 May 2026, 16:45', user: 'IP: 10.0.1.45',   action: 'failed-login','entity': 'System Auth',             detail: '14 failed attempts within 30 minutes — flagged',         type: 'error'   },
 ];
 
-// Get action badge
-const getActionBadge = (action: AuditEvent['action']) => {
-  return <StatusBadge status={action} />;
+const typeStyles: Record<string, string> = {
+  success: 'bg-emerald-500',
+  info:    'bg-blue-500',
+  warning: 'bg-amber-500',
+  error:   'bg-rose-500',
 };
 
-// Format timestamp
-const formatTimestamp = (timestamp: string) => {
-  const date = new Date(timestamp);
-  return new Intl.DateTimeFormat('en-US', {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(date);
-};
-
-// Get initials for avatar
-const getInitials = (name: string) => {
-  return name
-    .split(' ')
-    .map((part) => part[0])
-    .join('')
-    .toUpperCase()
-    .substring(0, 2);
+const actionBadge: Record<string, string> = {
+  update:       'bg-blue-500/10 text-blue-700 dark:text-blue-400',
+  create:       'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
+  delete:       'bg-rose-500/10 text-rose-700 dark:text-rose-400',
+  restore:      'bg-purple-500/10 text-purple-700 dark:text-purple-400',
+  login:        'bg-muted text-muted-foreground',
+  'add-user':   'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
+  'remove-user':'bg-amber-500/10 text-amber-700 dark:text-amber-400',
+  backup:       'bg-blue-500/10 text-blue-700 dark:text-blue-400',
+  'failed-login':'bg-rose-500/10 text-rose-700 dark:text-rose-400',
 };
 
 const AuditTrail = () => {
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const [actionFilter, setActionFilter] = useState<string>('all');
-  const [userFilter, setUserFilter] = useState<string>('all');
-  const [entityFilter, setEntityFilter] = useState<string>('all');
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const eventsPerPage = 8;
+  const [query, setQuery] = useState('');
 
-  // Get unique users, actions, entity types for filters
-  const users = [
-    { id: 'all', name: 'All Users' },
-    ...Array.from(
-      new Set(mockAuditEvents.map(event => event.user.id))
-    ).map(id => {
-      const user = mockAuditEvents.find(event => event.user.id === id)?.user;
-      return { id, name: user?.name || '' };
-    })
-  ];
-
-  const actions = [
-    { value: 'all', label: 'All Actions' },
-    { value: 'create', label: 'Create' },
-    { value: 'update', label: 'Update' },
-    { value: 'delete', label: 'Delete' },
-    { value: 'restore', label: 'Restore' },
-    { value: 'add-user', label: 'Add User' },
-    { value: 'remove-user', label: 'Remove User' },
-    { value: 'login', label: 'Login' },
-    { value: 'logout', label: 'Logout' },
-  ];
-
-  const entityTypes = [
-    { value: 'all', label: 'All Entities' },
-    ...Array.from(
-      new Set(mockAuditEvents.map(event => event.entityType))
-    ).map(type => ({ value: type, label: type.charAt(0).toUpperCase() + type.slice(1) }))
-  ];
-
-  // Filter events
-  const filteredEvents = mockAuditEvents.filter(event => {
-    // Filter by search term
-    if (
-      searchTerm &&
-      !event.entityName.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      !event.user.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      !(event.details && event.details.toLowerCase().includes(searchTerm.toLowerCase()))
-    ) {
-      return false;
-    }
-
-    // Filter by action
-    if (actionFilter !== 'all' && event.action !== actionFilter) {
-      return false;
-    }
-
-    // Filter by user
-    if (userFilter !== 'all' && event.user.id !== userFilter) {
-      return false;
-    }
-
-    // Filter by entity type
-    if (entityFilter !== 'all' && event.entityType !== entityFilter) {
-      return false;
-    }
-
-    return true;
-  });
-
-  // Pagination
-  const indexOfLastEvent = currentPage * eventsPerPage;
-  const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
-  const currentEvents = filteredEvents.slice(indexOfFirstEvent, indexOfLastEvent);
-  const totalPages = Math.ceil(filteredEvents.length / eventsPerPage);
-
-  // Handle revert
-  const handleRevert = (event: AuditEvent) => {
-    toast({
-      title: "Reverting changes...",
-      description: `Changes to "${event.entityName}" are being reverted.`
-    });
-  };
+  const filtered = logs.filter(
+    (l) =>
+      l.user.toLowerCase().includes(query.toLowerCase()) ||
+      l.action.toLowerCase().includes(query.toLowerCase()) ||
+      l.entity.toLowerCase().includes(query.toLowerCase()) ||
+      l.detail.toLowerCase().includes(query.toLowerCase())
+  );
 
   return (
     <DashboardLayout>
-      <DashboardHeader
-        title="Audit Trail"
-        description="Track and review all changes made to the system"
-      />
-      <div className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900 p-6">
-        <Card className="mb-6">
-          <CardHeader>
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <div>
-                <CardTitle>Activity History</CardTitle>
-                <CardDescription>Track all changes and activities in the system</CardDescription>
-              </div>
-              <div className="flex gap-2">
+      <DashboardHeader title="Audit Trail" />
+      <main className="flex-1 overflow-auto bg-background p-6 space-y-5">
+
+        {/* Stats row */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            { label: 'Events Today',    value: '14' },
+            { label: 'Unique Users',    value: '7'  },
+            { label: 'Errors / Alerts', value: '2'  },
+            { label: 'Total (30 days)', value: '482' },
+          ].map((k) => (
+            <Card key={k.label} className="p-4">
+              <p className="text-xs font-medium text-muted-foreground mb-1">{k.label}</p>
+              <div className="text-2xl font-bold text-foreground">{k.value}</div>
+            </Card>
+          ))}
+        </div>
+
+        {/* Log table */}
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between gap-3">
+              <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                <History className="h-4 w-4 text-muted-foreground" />
+                All Events
+              </CardTitle>
+              <div className="flex items-center gap-2">
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-2 h-3.5 w-3.5 text-muted-foreground" />
+                  <Input
+                    placeholder="Search logs…"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    className="pl-8 h-8 text-sm w-56"
+                  />
+                </div>
                 <Button variant="outline" size="sm">
-                  <Calendar className="h-4 w-4 mr-2" />
-                  Date Range
-                </Button>
-                <Button variant="outline" size="sm">
-                  <DownloadCloud className="h-4 w-4 mr-2" />
-                  Export
+                  <Download className="h-3.5 w-3.5 mr-2" /> Export
                 </Button>
               </div>
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="mb-4 flex flex-col md:flex-row gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search audit trail..."
-                  className="pl-8"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <Select
-                  value={actionFilter}
-                  onValueChange={setActionFilter}
-                >
-                  <SelectTrigger className="w-[140px]">
-                    <SelectValue placeholder="Action" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {actions.map((action) => (
-                      <SelectItem key={action.value} value={action.value}>
-                        {action.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Select
-                  value={userFilter}
-                  onValueChange={setUserFilter}
-                >
-                  <SelectTrigger className="w-[160px]">
-                    <SelectValue placeholder="User" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {users.map((user) => (
-                      <SelectItem key={user.id} value={user.id}>
-                        {user.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Select
-                  value={entityFilter}
-                  onValueChange={setEntityFilter}
-                >
-                  <SelectTrigger className="w-[160px]">
-                    <SelectValue placeholder="Entity" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {entityTypes.map((entity) => (
-                      <SelectItem key={entity.value} value={entity.value}>
-                        {entity.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+          <CardContent className="pt-0">
+            <div className="divide-y">
+              {filtered.map((log) => (
+                <div key={log.id} className="flex items-start gap-3 py-2.5">
+                  <div className={`w-1.5 h-1.5 rounded-full shrink-0 mt-1.5 ${typeStyles[log.type]}`} />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm font-medium text-foreground">{log.user}</span>
+                      <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${actionBadge[log.action] ?? 'bg-muted text-muted-foreground'}`}>
+                        {log.action}
+                      </span>
+                      <span className="text-sm text-muted-foreground truncate">{log.entity}</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-0.5 truncate">{log.detail}</p>
+                  </div>
+                  <span className="text-xs text-muted-foreground shrink-0">{log.time}</span>
+                </div>
+              ))}
+              {filtered.length === 0 && (
+                <p className="py-8 text-center text-sm text-muted-foreground">No matching events.</p>
+              )}
             </div>
-
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Time</TableHead>
-                  <TableHead>User</TableHead>
-                  <TableHead>Action</TableHead>
-                  <TableHead>Entity</TableHead>
-                  <TableHead>Details</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {currentEvents.map((event) => (
-                  <TableRow key={event.id}>
-                    <TableCell className="whitespace-nowrap">
-                      {formatTimestamp(event.timestamp)}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src={event.user.avatar} />
-                          <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                            {getInitials(event.user.name)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span>{event.user.name}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center">
-                        {getActionBadge(event.action)}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium">{event.entityName}</p>
-                        <p className="text-xs text-muted-foreground capitalize">{event.entityType}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell className="max-w-[250px] truncate">
-                      {event.details}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button variant="ghost" size="sm" disabled={!event.canRevert}>
-                            <History className="h-4 w-4 mr-1" />
-                            Revert
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-80">
-                          <div className="grid gap-4">
-                            <div className="space-y-2">
-                              <h4 className="font-medium leading-none">Confirm Revert</h4>
-                              <p className="text-sm text-muted-foreground">
-                                Are you sure you want to revert this change? This action cannot be undone.
-                              </p>
-                            </div>
-                            <div className="flex justify-end gap-2">
-                              <Button variant="outline" size="sm">Cancel</Button>
-                              <Button size="sm" onClick={() => handleRevert(event)}>
-                                <Undo className="h-4 w-4 mr-1" />
-                                Confirm
-                              </Button>
-                            </div>
-                          </div>
-                        </PopoverContent>
-                      </Popover>
-                    </TableCell>
-                  </TableRow>
-                ))}
-
-                {currentEvents.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center py-6">
-                      No activities found matching your search criteria.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-
-            {filteredEvents.length > eventsPerPage && (
-              <div className="mt-4">
-                <Pagination>
-                  <PaginationContent>
-                    <PaginationPrevious
-                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                      className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-                    />
-
-                    {Array.from({ length: totalPages }, (_, i) => i + 1)
-                      .filter(page => page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1)
-                      .map((page, idx, array) => (
-                        <React.Fragment key={page}>
-                          {idx > 0 && array[idx - 1] !== page - 1 && (
-                            <PaginationItem>
-                              <span className="px-2">...</span>
-                            </PaginationItem>
-                          )}
-                          <PaginationItem>
-                            <PaginationLink
-                              onClick={() => setCurrentPage(page)}
-                              isActive={page === currentPage}
-                            >
-                              {page}
-                            </PaginationLink>
-                          </PaginationItem>
-                        </React.Fragment>
-                      ))}
-
-                    <PaginationNext
-                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                      className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
-                    />
-                  </PaginationContent>
-                </Pagination>
-              </div>
-            )}
           </CardContent>
         </Card>
-      </div>
+      </main>
     </DashboardLayout>
   );
 };

@@ -37,7 +37,7 @@ const SchoolManagement = () => {
   return (
     <DashboardLayout>
       <DashboardHeader title="School Management" />
-      <div className="flex-1 overflow-auto bg-gray-50 p-6">
+      <div className="flex-1 overflow-auto bg-background p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <div className="mb-6">
             <TabsList className="w-full grid grid-cols-3 max-w-xl">

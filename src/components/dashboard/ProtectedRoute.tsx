@@ -15,7 +15,7 @@ const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
   // Show loading state while auth is initializing
   if (isLoading) {
     return (
-      <div className="h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="h-screen flex flex-col items-center justify-center bg-background">
         <Loader2 className="h-10 w-10 text-school-primary animate-spin mb-4" />
         <div className="text-xl font-medium text-gray-700 dark:text-gray-300">Verifying authentication...</div>
         <p className="text-sm text-muted-foreground dark:text-gray-400 mt-2">Please wait while we check your credentials</p>

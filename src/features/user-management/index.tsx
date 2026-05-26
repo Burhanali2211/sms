@@ -30,7 +30,7 @@ const UserManagement = () => {
   return (
     <DashboardLayout>
       <DashboardHeader title="User Management" />
-      <div className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900 p-6">
+      <div className="flex-1 overflow-auto bg-background p-6">
         <UserStats users={users} />
         
         <Card>

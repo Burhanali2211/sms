@@ -22,7 +22,7 @@ const Attendance = () => {
   return (
     <DashboardLayout>
       <DashboardHeader title="Attendance" description="Track your class attendance" />
-      <div className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900 p-6">
+      <div className="flex-1 overflow-auto bg-background p-6">
         <AttendanceStats 
           totalClasses={totalClasses}
           presentClasses={presentClasses}

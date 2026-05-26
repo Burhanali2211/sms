@@ -11,6 +11,8 @@ import FunctionalNotifications from "@/components/dashboard/FunctionalNotificati
 import FunctionalCalendarWidget from "@/components/dashboard/FunctionalCalendarWidget";
 import DataAnalyticsWidget from "@/components/dashboard/DataAnalyticsWidget";
 import SuperAdminDashboard from "@/pages/dashboard/admin/SuperAdminDashboard";
+import AdminDashboard from "@/pages/dashboard/admin/AdminDashboard";
+import PrincipalDashboard from "@/pages/dashboard/admin/PrincipalDashboard";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
 import LoadingSpinner from "@/components/ui/loading-spinner";
 import ErrorBoundary from "@/components/ui/error-boundary";
@@ -40,32 +42,24 @@ const Dashboard = () => {
       <DashboardLayout>
         <DashboardHeader title="Dashboard" />
 
-        <main className="flex-1 overflow-auto dashboard-content p-6 space-y-6 bg-slate-50/50">
-          {(user.role === 'super-admin' || user.role === 'admin') ? (
+        <main className="flex-1 overflow-auto dashboard-content p-6 space-y-6 bg-background">
+          {user.role === 'super-admin' ? (
             <SuperAdminDashboard />
+          ) : user.role === 'admin' ? (
+            <AdminDashboard />
+          ) : user.role === 'principal' ? (
+            <PrincipalDashboard />
           ) : (
             <>
-              {/* Main Stats */}
               <DashboardStats stats={stats} isStatsLoading={dashboardLoading} />
-
-              {/* Enhanced Dashboard Grid */}
               <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
-                {/* Quick Actions */}
                 <QuickActions />
-                
-                {/* Real-time Notifications */}
                 <FunctionalNotifications />
-                
-                {/* Enhanced Calendar */}
                 <FunctionalCalendarWidget />
               </div>
-
-              {/* Analytics Widget - Full Width */}
               <div className="grid gap-6 grid-cols-1">
                 <DataAnalyticsWidget />
               </div>
-
-              {/* Role-specific dashboard content */}
               <RoleBasedContent role={user.role as UserRole} />
             </>
           )}

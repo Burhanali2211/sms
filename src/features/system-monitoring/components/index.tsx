@@ -38,7 +38,7 @@ const SystemMonitoring = () => {
         title="System Monitoring"
         description="Real-time monitoring of system resources and services"
       />
-      <div className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900 p-6">
+      <div className="flex-1 overflow-auto bg-background p-6">
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
             {mockSystemStatus.status === 'healthy' ? (

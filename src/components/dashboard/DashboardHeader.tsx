@@ -45,7 +45,7 @@ const DashboardHeader = ({ title, description }: DashboardHeaderProps) => {
       <div className="flex items-center">
         <SidebarTrigger className="mr-4 hover:bg-accent hover:text-accent-foreground rounded-md p-1" />
         <div>
-          <h1 className="text-xl font-semibold bg-gradient-to-r from-school-primary to-school-secondary bg-clip-text text-transparent">
+          <h1 className="text-xl font-semibold text-foreground">
             {title}
           </h1>
           {description && (
@@ -78,15 +78,19 @@ const DashboardHeader = ({ title, description }: DashboardHeaderProps) => {
             </div>
             <DropdownMenuSeparator />
             <div className="max-h-80 overflow-auto">
-              {[1, 2, 3].map((i) => (
+              {[
+                { title: "Fee Payment Received", msg: "Arjun Kapoor (Class X-B) paid ₹12,500 term fee.", time: "12 mins ago" },
+                { title: "New Admission Request", msg: "Application from Sneha Rajput for Class 9 received.", time: "1 hour ago" },
+                { title: "Timetable Updated", msg: "Semester II timetable published by Vikram Patel.", time: "3 hours ago" },
+              ].map((n, i) => (
                 <DropdownMenuItem key={i} className="p-4 cursor-pointer hover:bg-accent">
                   <div className="w-full">
                     <div className="flex items-center justify-between mb-1">
-                      <p className="font-medium">Notification Title {i}</p>
+                      <p className="font-medium text-sm">{n.title}</p>
                       <Badge variant="outline" className="text-xs px-1 py-0">New</Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground">This is a notification message.</p>
-                    <p className="text-xs text-muted-foreground mt-1">{i} hour{i > 1 ? 's' : ''} ago</p>
+                    <p className="text-sm text-muted-foreground">{n.msg}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{n.time}</p>
                   </div>
                 </DropdownMenuItem>
               ))}

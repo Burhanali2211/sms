@@ -54,7 +54,7 @@ const Courses = () => {
   return (
     <DashboardLayout>
       <DashboardHeader title="My Courses" description="Track your enrolled courses and progress" />
-      <div className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900 p-6">
+      <div className="flex-1 overflow-auto bg-background p-6">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-6">
           <Card>
             <CardHeader className="pb-2">

@@ -5,7 +5,6 @@ import { LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import DashboardNav from "./DashboardNav";
 import { useNavigate } from "react-router-dom";
-import { ThemeSwitcher } from "@/components/ui/theme-switcher";
 import { useTheme } from "@/contexts/ThemeContext";
 import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
@@ -29,7 +28,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   // Show loading state while auth is initializing
   if (isLoading) {
     return (
-      <div className="h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="h-screen flex flex-col items-center justify-center bg-background">
         <Loader2 className="h-10 w-10 text-school-primary animate-spin mb-4" />
         <div className="text-xl font-medium text-gray-700 dark:text-gray-300">Loading dashboard...</div>
         <p className="text-sm text-muted-foreground dark:text-gray-400 mt-2">Please wait while we prepare your personalized workspace</p>
@@ -49,13 +48,15 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     )}>
       <SidebarProvider>
         <Sidebar className="bg-card dark:bg-card border-r shadow-sm">
-          <SidebarHeader className="px-6 py-6 border-b">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold">
-                <span className="text-school-primary">Edu</span>
-                <span className="text-school-secondary">Sync</span>
-              </h2>
-              <ThemeSwitcher />
+          <SidebarHeader className="px-6 py-5 border-b">
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-school-primary text-white font-bold text-sm shrink-0">
+                E
+              </div>
+              <div className="leading-tight">
+                <p className="text-sm font-bold text-foreground">EIT SMS</p>
+                <p className="text-[10px] text-muted-foreground">School Management</p>
+              </div>
             </div>
           </SidebarHeader>
           

@@ -23,7 +23,7 @@ const BackupRecovery = () => {
         title="Backup & Recovery" 
         description="Manage system backups and data recovery"
       />
-      <div className="flex-1 overflow-auto bg-gray-50 p-6">
+      <div className="flex-1 overflow-auto bg-background p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList>
             <TabsTrigger value="backups">Backups</TabsTrigger>

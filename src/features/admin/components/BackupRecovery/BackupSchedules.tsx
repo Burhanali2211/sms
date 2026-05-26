@@ -252,8 +252,8 @@ export const BackupSchedules = ({ schedules, setSchedules }: BackupSchedulesProp
                 <TableCell>
                   <Badge variant={schedule.enabled ? "outline" : "secondary"} className={
                     schedule.enabled 
-                      ? "bg-green-100 text-green-800 hover:bg-green-100" 
-                      : "bg-gray-100 text-gray-800 hover:bg-gray-100"
+                      ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+                      : "bg-muted text-muted-foreground"
                   }>
                     {schedule.enabled ? 'Enabled' : 'Disabled'}
                   </Badge>

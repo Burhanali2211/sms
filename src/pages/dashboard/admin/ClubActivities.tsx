@@ -169,7 +169,7 @@ const ClubActivities = () => {
   return (
     <DashboardLayout>
       <DashboardHeader title="Clubs & Activities" />
-      <div className="flex-1 overflow-auto bg-gray-50 p-6">
+      <div className="flex-1 overflow-auto bg-background p-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
           <Card>
             <CardHeader className="pb-2">
@@ -394,7 +394,7 @@ const ClubActivities = () => {
                           Active
                         </Badge>
                       ) : (
-                        <Badge variant="outline" className="bg-gray-100 text-gray-800 hover:bg-gray-100">
+                        <Badge variant="outline" className="bg-muted text-muted-foreground">
                           <X className="h-3.5 w-3.5 mr-1" />
                           Inactive
                         </Badge>
