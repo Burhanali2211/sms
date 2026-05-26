@@ -42,7 +42,7 @@ const Dashboard = () => {
       <DashboardLayout>
         <DashboardHeader title="Dashboard" />
 
-        <main className="flex-1 overflow-auto dashboard-content p-6 space-y-6 bg-background">
+        <main className="flex-1 overflow-auto dashboard-content p-6 space-y-6" style={{ background: '#f0fdf4' }}>
           {user.role === 'super-admin' ? (
             <SuperAdminDashboard />
           ) : user.role === 'admin' ? (

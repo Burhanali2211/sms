@@ -1,1 +1,4 @@
 Stop-Process -Name node -Force -ErrorAction SilentlyContinue
+
+
+vercel prod = vercel --prod 

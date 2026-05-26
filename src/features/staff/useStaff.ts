@@ -21,6 +21,10 @@ const mockStaffData = [
   { id: "18", name: "Thomas Joseph", role: "Economics Teacher", department: "Social Studies", email: "thomas.joseph@eitsms.edu.in", phone: "98218-88902", joinDate: "2016-11-08", status: "inactive", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=ThomasJoseph" },
 ];
 
+export const getStaffById = (id: string) => {
+  return mockStaffData.find(staff => staff.id === id);
+};
+
 export const useStaff = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState("all");
@@ -43,6 +47,10 @@ export const useStaff = () => {
     return matchesSearch && matchesDepartment && matchesStatus;
   });
 
+  const totalStaff = mockStaffData.length;
+  const activeStaff = mockStaffData.filter(s => s.status === "active").length;
+  const leaveStaff = mockStaffData.filter(s => s.status === "leave").length;
+
   return {
     searchQuery,
     setSearchQuery,
@@ -51,6 +59,9 @@ export const useStaff = () => {
     statusFilter,
     setStatusFilter,
     departments,
-    filteredStaff
+    filteredStaff,
+    totalStaff,
+    activeStaff,
+    leaveStaff
   };
 };

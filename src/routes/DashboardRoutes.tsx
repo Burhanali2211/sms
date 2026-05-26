@@ -8,6 +8,7 @@ import Settings from "@/pages/dashboard/Settings";
 import Unauthorized from "@/pages/dashboard/Unauthorized";
 import SchoolOverview from "@/pages/dashboard/SchoolOverview";
 import Staff from "@/pages/dashboard/Staff";
+import StaffProfile from "@/pages/dashboard/staff/StaffProfile";
 import Courses from "@/pages/dashboard/student/Courses";
 import Attendance from "@/pages/dashboard/student/Attendance";
 import AttendanceStudent from "@/pages/dashboard/student/Attendance";
@@ -86,6 +87,12 @@ const DashboardRoutes = () => {
       <Route path="/dashboard/staff" element={
         <ProtectedRoute allowedRoles={['principal', 'school-admin', 'super-admin']}>
           <Staff />
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/dashboard/staff/:id" element={
+        <ProtectedRoute allowedRoles={['principal', 'school-admin', 'super-admin']}>
+          <StaffProfile />
         </ProtectedRoute>
       } />
       
